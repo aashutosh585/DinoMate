@@ -4,6 +4,7 @@ import JobDetails from "../components/JobDetails";
 import JobSearchBar from "../components/JobSearchBar";
 import PaginatedJobList from "../components/PaginatedJobList";
 import API_URL from "../api/config";
+import clientCache from "../utils/cache";
 
 export default function Jobs() {
   const [searchParams] = useSearchParams();
@@ -20,47 +21,77 @@ export default function Jobs() {
     fetchAllJobs(0, 10, jobId);
   }, []);
 
-  const fetchAllJobs = async (page = 0, size = 10, targetJobId = null) => {
-    setLoading(true);
-    try {
-      const res = await fetch(
-        `${API_URL}/jobs?page=${page}&size=${size}`,
-        { headers: { "Content-Type": "application/json" } }
-      );
+  const applyJobsData = (data, targetJobId) => {
+    if (!data || !data.content) return;
+    setJobs(data.content);
+    setCurrentPage(data.currentPage);
+    setTotalPages(data.totalPages);
+    setTotalElements(data.totalElements);
 
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("❌ Failed to fetch jobs:", res.status, errorText);
-        setError("Failed to fetch jobs.");
-        return;
+    if (targetJobId) {
+      const found = data.content.find((j) => String(j.id) === String(targetJobId));
+      if (found) {
+        setSelectedJob(found);
+      } else {
+        clientCache.fetchWithCache(
+          `job:detail:${targetJobId}`,
+          async () => {
+            const jobRes = await fetch(`${API_URL}/jobs/${targetJobId}`, {
+              headers: { "Content-Type": "application/json" },
+            });
+            return jobRes.ok ? await jobRes.json() : null;
+          },
+          { ttl: 5 * 60 * 1000 }
+        ).then((res) => {
+          setSelectedJob(res || data.content[0] || null);
+        });
       }
+    } else {
+      setSelectedJob(data.content[0] || null);
+    }
+  };
 
-      const data = await res.json();
-      setJobs(data.content);
-      setCurrentPage(data.currentPage);
-      setTotalPages(data.totalPages);
-      setTotalElements(data.totalElements);
+  const fetchAllJobs = async (page = 0, size = 10, targetJobId = null) => {
+    const cacheKey = `jobs:page:${page}:size:${size}`;
+    const cached = clientCache.get(cacheKey);
 
-      if (targetJobId) {
-        const found = data.content.find((j) => String(j.id) === String(targetJobId));
-        if (found) {
-          setSelectedJob(found);
-        } else {
-          const jobRes = await fetch(`${API_URL}/jobs/${targetJobId}`, {
-            headers: { "Content-Type": "application/json" },
-          });
-          if (jobRes.ok) {
-            setSelectedJob(await jobRes.json());
-          } else {
-            setSelectedJob(data.content[0] || null);
+    // If cached, render instantly with 0ms wait
+    if (cached) {
+      applyJobsData(cached.data, targetJobId);
+      if (!cached.isStale) return;
+    } else {
+      setLoading(true);
+    }
+
+    try {
+      const data = await clientCache.fetchWithCache(
+        cacheKey,
+        async () => {
+          const res = await fetch(
+            `${API_URL}/jobs?page=${page}&size=${size}`,
+            { headers: { "Content-Type": "application/json" } }
+          );
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error("❌ Failed to fetch jobs:", res.status, errorText);
+            throw new Error("Failed to fetch jobs.");
+          }
+          return await res.json();
+        },
+        {
+          ttl: 2 * 60 * 1000,
+          swr: true,
+          persist: true,
+          onRevalidated: (freshData) => {
+            applyJobsData(freshData, targetJobId);
           }
         }
-      } else {
-        setSelectedJob(data.content[0] || null);
-      }
+      );
+
+      applyJobsData(data, targetJobId);
     } catch (err) {
       console.error("🔥 Error:", err.message);
-      setError("Something went wrong.");
+      if (!cached) setError("Failed to fetch jobs.");
     } finally {
       setLoading(false);
     }
@@ -72,7 +103,38 @@ export default function Jobs() {
       return;
     }
 
-    setLoading(true);
+    const searchCacheKey = `jobs:search:${title.trim()}_${location.trim()}_${type.trim()}`;
+    const cachedSearch = clientCache.get(searchCacheKey);
+    if (cachedSearch) {
+      setJobs(cachedSearch.data);
+      setSelectedJob(cachedSearch.data[0] || null);
+      if (!cachedSearch.isStale) return;
+    } else {
+      setLoading(true);
+    }
+
+    // Trigger live aggregator sync if keyword (title) is provided
+    if (title.trim()) {
+      try {
+        // We run a quick scrape and save to DB before querying
+        await fetch(`${API_URL}/api/aggregator/scrape`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            keyword: title.trim(),
+            location: location.trim() || 'Remote',
+            sources: ['linkedin', 'indeed', 'glassdoor', 'ziprecruiter'],
+            limit: 20,
+            dryRun: false
+          })
+        });
+        // Invalidate cache since new jobs were inserted
+        clientCache.invalidateNamespace("jobs");
+      } catch (err) {
+        console.error("Aggregator sync failed:", err);
+      }
+    }
+
     try {
       let titleResults = null;
       let locationResults = null;
@@ -115,6 +177,7 @@ export default function Jobs() {
       const idSets = allResultSets.map((r) => new Set(r.map((j) => j.id)));
       const finalResults = allResultSets[0].filter((j) => idSets.every((s) => s.has(j.id)));
 
+      clientCache.set(searchCacheKey, finalResults, 60 * 1000);
       setJobs(finalResults);
       setSelectedJob(finalResults[0] || null);
     } catch (err) {

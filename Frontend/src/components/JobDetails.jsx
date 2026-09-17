@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { successToast, errorToast, infoToast } from "../utils/toastUtils";
 import apiClient from "../api/client";
+import clientCache from "../utils/cache";
 
 export default function JobDetails({ job }) {
   const navigate = useNavigate();
@@ -22,10 +23,12 @@ export default function JobDetails({ job }) {
       if (!token || !job) return;
 
       try {
-        const { data: savedJobs } = await apiClient.get("/user/saved-jobs");
-        setSaved(savedJobs.some((savedJob) => savedJob.id === job.id));
+        const savedJobs = await apiClient.getCached("/user/saved-jobs", {}, { ttl: 2 * 60 * 1000, swr: true });
+        if (Array.isArray(savedJobs)) {
+          setSaved(savedJobs.some((savedJob) => savedJob.id === job.id));
+        }
 
-        const { data: applied } = await apiClient.get(`/applications/has-applied/${job.id}`);
+        const applied = await apiClient.getCached(`/applications/has-applied/${job.id}`, {}, { ttl: 5 * 60 * 1000 });
         setHasApplied(applied);
       } catch (err) {
         console.error("Error fetching status:", err);
@@ -52,9 +55,12 @@ export default function JobDetails({ job }) {
 
     setSaving(true);
     try {
-      saved
-        ? await apiClient.delete(`/user/unsave-job/${job.id}`)
-        : await apiClient.post(`/user/save-job/${job.id}`);
+      if (saved) {
+        await apiClient.delete(`/user/unsave-job/${job.id}`);
+      } else {
+        await apiClient.post(`/user/save-job/${job.id}`);
+      }
+      clientCache.invalidateNamespace("api:/user/saved-jobs");
       setSaved(!saved);
       successToast(saved ? "Job removed from saved list." : "Job saved successfully!");
     } catch (err) {

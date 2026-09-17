@@ -48,6 +48,9 @@ build/
 *.tar.gz
 *.rar
 
+.vscode
+
+
 # Maven wrapper jar (uncomment if wrapper jar is not tracked)
 # .mvn/wrapper/maven-wrapper.jar
 .mvn/timing.properties

@@ -8,6 +8,7 @@ import com.job.repository.EmployerRepository;
 import com.job.repository.JobSeekerRepository;
 import com.job.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +24,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -36,9 +38,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private final JobSeekerRepository jobSeekerRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
+    protected void doFilterInternal(@org.springframework.lang.NonNull HttpServletRequest request,
+                                    @org.springframework.lang.NonNull HttpServletResponse response,
+                                    @org.springframework.lang.NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
@@ -63,11 +65,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 "{\"error\":\"TOKEN_EXPIRED\",\"message\":\"Your session has expired, please log in again\"}"
             );
             return;
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("Invalid JWT for request {}: {}", request.getRequestURI(), e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(
+                "{\"error\":\"INVALID_TOKEN\",\"message\":\"Invalid or malformed authentication token\"}"
+            );
+            return;
         }
 
-        if (username == null) {
-            log.error("Could not extract username from token");
-            filterChain.doFilter(request, response);
+        if (username == null || username.isBlank()) {
+            log.error("Could not extract valid username from token for request: {}", request.getRequestURI());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(
+                "{\"error\":\"INVALID_TOKEN\",\"message\":\"Token contains no valid user identity\"}"
+            );
             return;
         }
 
@@ -76,7 +90,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         if (optionalUser.isEmpty()) {
             log.warn("No user found with username: {}", username);
-            filterChain.doFilter(request, response);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write(
+                "{\"error\":\"USER_NOT_FOUND\",\"message\":\"User associated with this token was not found\"}"
+            );
             return;
         }
 
@@ -92,15 +110,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         log.debug("Security context set for user: {} with role: {}", username, roleName);
 
         if (user.getRole() == Role.EMPLOYER) {
-            employerRepository.findById(user.getId()).ifPresentOrElse(
-                    employer -> request.setAttribute("user", employer),
-                    () -> log.warn("Employer record not found for user id: {}", user.getId())
-            );
+            Optional<Employer> employer = employerRepository.findById(Objects.requireNonNull(user.getId()));
+            if (employer.isPresent()) {
+                request.setAttribute("user", employer.get());
+            } else {
+                log.warn("Employer record not found for user id: {}", user.getId());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"INVALID_USER\",\"message\":\"Employer profile is incomplete\"}");
+                return;
+            }
         } else if (user.getRole() == Role.JOB_SEEKER) {
-            jobSeekerRepository.findById(user.getId()).ifPresentOrElse(
-                    jobSeeker -> request.setAttribute("user", jobSeeker),
-                    () -> log.warn("JobSeeker record not found for user id: {}", user.getId())
-            );
+            Optional<JobSeeker> jobSeeker = jobSeekerRepository.findById(Objects.requireNonNull(user.getId()));
+            if (jobSeeker.isPresent()) {
+                request.setAttribute("user", jobSeeker.get());
+            } else {
+                log.warn("JobSeeker record not found for user id: {}", user.getId());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType("application/json");
+                response.getWriter().write("{\"error\":\"INVALID_USER\",\"message\":\"Job seeker profile is incomplete\"}");
+                return;
+            }
         } else {
             request.setAttribute("user", user);
         }

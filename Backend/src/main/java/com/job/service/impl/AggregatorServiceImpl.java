@@ -3,37 +3,30 @@ package com.job.service.impl;
 import com.job.dto.aggregator.AggregatorJobDTO;
 import com.job.dto.aggregator.AggregatorScrapeRequestDTO;
 import com.job.dto.aggregator.AggregatorScrapeResponseDTO;
-import com.job.entity.Employer;
-import com.job.entity.Job;
-import com.job.enums.JobType;
-import com.job.enums.Role;
-import com.job.enums.WorkMode;
-import com.job.repository.EmployerRepository;
-import com.job.repository.JobRepository;
+import com.job.entity.AggregatedJob;
+import com.job.repository.AggregatedJobRepository;
 import com.job.service.interfaces.IAggregatorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Objects;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AggregatorServiceImpl implements IAggregatorService {
 
-    private final JobRepository jobRepository;
-    private final EmployerRepository employerRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final AggregatedJobRepository aggregatedJobRepository;
 
     @Value("${aggregator.api.url:http://localhost:3001/api/scrape}")
     private String aggregatorApiUrl;
@@ -45,10 +38,21 @@ public class AggregatorServiceImpl implements IAggregatorService {
     private String adminEmail;
 
     private RestTemplate getRestTemplate() {
-        return new RestTemplateBuilder()
-                .setConnectTimeout(Duration.ofSeconds(15))
-                .setReadTimeout(Duration.ofSeconds(45))
-                .build();
+        return new RestTemplate();
+    }
+
+    private String resolveScrapeEndpoint() {
+        String url = aggregatorApiUrl != null && !aggregatorApiUrl.isBlank()
+                ? aggregatorApiUrl.trim()
+                : "http://localhost:3001/api/scrape";
+        if (!url.endsWith("/api/scrape")) {
+            if (url.endsWith("/")) {
+                url = url + "api/scrape";
+            } else {
+                url = url + "/api/scrape";
+            }
+        }
+        return url;
     }
 
     @Override
@@ -70,7 +74,7 @@ public class AggregatorServiceImpl implements IAggregatorService {
             request.setLimit(30);
         }
         if (request.getDryRun() == null) {
-            request.setDryRun(true);
+            request.setDryRun(false);
         }
         if (request.getTriggerSource() == null || request.getTriggerSource().isBlank()) {
             request.setTriggerSource("admin");
@@ -83,14 +87,15 @@ public class AggregatorServiceImpl implements IAggregatorService {
         headers.set("Authorization", "Bearer " + secret);
 
         HttpEntity<AggregatorScrapeRequestDTO> entity = new HttpEntity<>(request, headers);
+        String targetUrl = resolveScrapeEndpoint();
 
         try {
             log.info("Dispatching scrape call to DinoMate API: {} for keyword='{}', location='{}', sources={}, dryRun={}",
-                    aggregatorApiUrl, request.getKeyword(), request.getLocation(), request.getSources(), request.getDryRun());
+                    targetUrl, request.getKeyword(), request.getLocation(), request.getSources(), request.getDryRun());
 
             ResponseEntity<AggregatorScrapeResponseDTO> response = getRestTemplate().exchange(
-                    aggregatorApiUrl,
-                    HttpMethod.POST,
+                    Objects.requireNonNull(targetUrl),
+                    Objects.requireNonNull(HttpMethod.POST),
                     entity,
                     AggregatorScrapeResponseDTO.class
             );
@@ -117,12 +122,12 @@ public class AggregatorServiceImpl implements IAggregatorService {
             return responseBody;
 
         } catch (ResourceAccessException e) {
-            log.warn("DinoMate Aggregator service unreachable at {}: {}", aggregatorApiUrl, e.getMessage());
+            log.warn("DinoMate Aggregator service unreachable at {}: {}", targetUrl, e.getMessage());
             return AggregatorScrapeResponseDTO.builder()
                     .success(false)
                     .keyword(request.getKeyword())
                     .executionTimeMs(System.currentTimeMillis() - startTime)
-                    .message("DinoMate Aggregator API at " + aggregatorApiUrl + " is currently offline or unreachable. Ensure the service is running on port 3001.")
+                    .message("DinoMate Aggregator API at " + targetUrl + " is currently offline or unreachable.")
                     .errors(List.of("Connection failed: " + e.getMessage()))
                     .jobs(Collections.emptyList())
                     .build();
@@ -155,62 +160,48 @@ public class AggregatorServiceImpl implements IAggregatorService {
                         ? dto.getCompany().trim()
                         : "Tech Company";
 
-                // 1. Get or create Employer entity
-                Employer employer = getOrCreateEmployer(companyName);
-
-                // 2. Check for duplicate job
-                boolean exists = jobRepository.existsByTitleIgnoreCaseAndEmployer(dto.getTitle().trim(), employer);
+                // 1. Check for duplicate job
+                boolean exists = aggregatedJobRepository.existsByTitleIgnoreCaseAndCompanyNameIgnoreCase(dto.getTitle().trim(), companyName);
                 if (exists) {
                     dto.setSavedToDb(false);
                     skipped++;
                     continue;
                 }
 
-                // 3. Build Job entity
-                Job job = new Job();
+                // 2. Build AggregatedJob entity
+                AggregatedJob job = new AggregatedJob();
                 job.setTitle(dto.getTitle().trim());
+                job.setCompanyName(companyName);
 
-                // Build rich description with apply link and source
-                String applyLink = dto.getUrl() != null ? dto.getUrl() : (dto.getLink() != null ? dto.getLink() : "#");
-                StringBuilder desc = new StringBuilder();
-                if (dto.getDescription() != null && !dto.getDescription().isBlank()) {
-                    desc.append(dto.getDescription().trim());
-                } else {
-                    desc.append("Exciting opportunity for a ").append(dto.getTitle()).append(" at ").append(companyName).append(".");
-                }
-                desc.append("\n\n---\n")
-                        .append("🔗 **Apply Link**: ").append(applyLink).append("\n")
-                        .append("🌐 **Source**: ").append(dto.getSource() != null ? dto.getSource() : "Aggregator API");
-
-                // Truncate to safe column limit (max 5000 characters)
-                String descStr = desc.toString();
-                if (descStr.length() > 4900) {
+                // Description
+                String descStr = dto.getDescription();
+                if (descStr != null && descStr.length() > 4900) {
                     descStr = descStr.substring(0, 4900) + "...";
                 }
-                job.setDescription(descStr);
+                job.setDescription(descStr != null ? descStr : "");
 
                 job.setLocation((dto.getLocation() != null && !dto.getLocation().isBlank()) ? dto.getLocation() : "Remote");
-                job.setType(determineJobType(dto));
-                job.setWorkMode(determineWorkMode(dto));
-                job.setJobSource(com.job.enums.JobSource.AGGREGATED);
+                job.setExperienceLevel(dto.getExperienceLevel());
+                job.setWorkMode(dto.getWorkMode());
+                
+                String applyLink = dto.getUrl() != null ? dto.getUrl() : (dto.getLink() != null ? dto.getLink() : "#");
+                job.setUrl(applyLink);
                 job.setSourcePlatform(dto.getSource() != null ? dto.getSource() : "Aggregator");
-                job.setExternalApplyUrl(applyLink);
+                
+                job.setSalaryMin(dto.getSalaryMin() != null ? dto.getSalaryMin().intValue() : null);
+                job.setSalaryMax(dto.getSalaryMax() != null ? dto.getSalaryMax().intValue() : null);
+                job.setCurrency(dto.getCurrency());
+                
                 job.setPostedAt(LocalDateTime.now());
-                job.setEmployer(employer);
+                job.setScrapedAt(LocalDateTime.now());
 
                 if (dto.getSkills() != null && !dto.getSkills().isEmpty()) {
                     job.setRequiredSkills(new ArrayList<>(dto.getSkills()));
                 } else {
-                    job.setRequiredSkills(new ArrayList<>(List.of("Software Engineering", "Problem Solving")));
+                    job.setRequiredSkills(new ArrayList<>(List.of("Software Engineering")));
                 }
 
-                job.setResponsibilities(new ArrayList<>(List.of(
-                        "Design, build, and maintain scalable solutions.",
-                        "Collaborate with engineering and product teams to deliver high quality features.",
-                        "Participate in code reviews and engineering best practices."
-                )));
-
-                jobRepository.save(job);
+                aggregatedJobRepository.save(job);
                 dto.setSavedToDb(true);
                 inserted++;
 
@@ -228,56 +219,7 @@ public class AggregatorServiceImpl implements IAggregatorService {
         return stats;
     }
 
-    private Employer getOrCreateEmployer(String companyName) {
-        return employerRepository.findByCompanyNameIgnoreCase(companyName).orElseGet(() -> {
-            String slug = companyName.toLowerCase().replaceAll("[^a-z0-9]", "");
-            if (slug.isBlank()) slug = "company";
-            String uniqueSuffix = UUID.randomUUID().toString().substring(0, 6);
 
-            Employer emp = new Employer();
-            emp.setCompanyName(companyName);
-            emp.setIndustry("Technology / Software");
-            emp.setName(companyName + " Hiring Team");
-            emp.setUsername("aggregator_" + slug + "_" + uniqueSuffix);
-            emp.setEmail(slug + "_" + uniqueSuffix + "@dinomate.internal");
-            emp.setPassword(passwordEncoder.encode("DinoMate@" + UUID.randomUUID()));
-            emp.setRole(Role.EMPLOYER);
-            emp.setProfilePictureUrl(null);
-            return employerRepository.save(emp);
-        });
-    }
-
-    private JobType determineJobType(AggregatorJobDTO dto) {
-        String level = dto.getExperienceLevel() != null ? dto.getExperienceLevel().toUpperCase() : "";
-        String title = dto.getTitle() != null ? dto.getTitle().toUpperCase() : "";
-
-        if (level.contains("INTERN") || title.contains("INTERN")) {
-            return JobType.INTERNSHIP;
-        }
-        if (title.contains("CONTRACT") || title.contains("FREELANCE")) {
-            return JobType.CONTRACT;
-        }
-        if (title.contains("PART-TIME") || title.contains("PART TIME")) {
-            return JobType.PART_TIME;
-        }
-        return JobType.FULL_TIME;
-    }
-
-    private WorkMode determineWorkMode(AggregatorJobDTO dto) {
-        String wm = dto.getWorkMode() != null ? dto.getWorkMode().toUpperCase() : "";
-        String loc = dto.getLocation() != null ? dto.getLocation().toUpperCase() : "";
-
-        if (wm.contains("REMOTE") || loc.contains("REMOTE")) {
-            return WorkMode.REMOTE;
-        }
-        if (wm.contains("HYBRID") || loc.contains("HYBRID")) {
-            return WorkMode.HYBRID;
-        }
-        if (wm.contains("ONSITE") || wm.contains("ON-SITE") || wm.contains("IN-OFFICE")) {
-            return WorkMode.ONSITE;
-        }
-        return WorkMode.HYBRID;
-    }
 
     @Override
     public Map<String, List<String>> getPlatformClusters() {
@@ -289,5 +231,10 @@ public class AggregatorServiceImpl implements IAggregatorService {
         clusters.put("Indian Tech Market", List.of("naukri", "internshala", "linkedin", "indeed"));
         clusters.put("General High Volume (Global)", List.of("linkedin", "indeed", "glassdoor", "ziprecruiter", "adzuna"));
         return clusters;
+    }
+
+    @Override
+    public Page<AggregatedJob> getSavedJobs(int page, int size) {
+        return aggregatedJobRepository.findAllByOrderByScrapedAtDesc(PageRequest.of(page, size));
     }
 }

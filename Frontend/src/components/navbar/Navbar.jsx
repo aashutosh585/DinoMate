@@ -4,11 +4,11 @@ import NavbarEmployer from "./NavbarEmployer";
 import NavbarJobSeeker from "./NavbarJobSeeker";
 import NavbarGuest from "./NavbarGuest";
 
-export default function Navbar({ onOpenJobSeeker, onOpenEmployer }) {
+export default function Navbar({ onOpenAuth }) {
   const { user } = useContext(AuthContext);
 
   if (!user) {
-    return <NavbarGuest onOpenJobSeeker={onOpenJobSeeker} onOpenEmployer={onOpenEmployer} />;
+    return <NavbarGuest onOpenAuth={onOpenAuth} />;
   }
 
   if (user.role === "EMPLOYER") {

@@ -8,6 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import com.job.entity.AggregatedJob;
+
 import java.util.List;
 import java.util.Map;
 
@@ -34,5 +37,13 @@ public class AggregatorController {
     @GetMapping("/clusters")
     public ResponseEntity<Map<String, List<String>>> getPlatformClusters() {
         return ResponseEntity.ok(aggregatorService.getPlatformClusters());
+    }
+
+    @GetMapping("/jobs")
+    public ResponseEntity<Page<AggregatedJob>> getSavedJobs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size
+    ) {
+        return ResponseEntity.ok(aggregatorService.getSavedJobs(page, size));
     }
 }

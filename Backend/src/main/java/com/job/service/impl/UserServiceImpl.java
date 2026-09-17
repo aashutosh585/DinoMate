@@ -45,18 +45,18 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public JobSeeker registerJobSeekerWithoutFiles(JobSeekerRegisterRequestDTO dto) {
-        if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new DuplicateResourceException("Username already taken");
+        if (userRepository.existsByUsername(dto.getEmail())) {
+            throw new DuplicateResourceException("Email already taken as username");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new DuplicateResourceException("Email already registered");
         }
-        log.info("Registering new job seeker: {}", dto.getUsername());
+        log.info("Registering new job seeker: {}", dto.getEmail());
         JobSeeker jobSeeker = new JobSeeker();
         jobSeeker.setName(dto.getName());
-        jobSeeker.setUsername(dto.getUsername());
+        jobSeeker.setUsername(dto.getEmail());
         jobSeeker.setPassword(passwordEncoder.encode(dto.getPassword()));
-        jobSeeker.setDob(dto.getDob());
+        jobSeeker.setDob(java.time.LocalDate.of(2000, 1, 1)); // Default to satisfy NOT NULL DB constraint
         jobSeeker.setRole(Role.JOB_SEEKER);
         jobSeeker.setEmail(dto.getEmail());
         jobSeeker.setResumeUrl(null);
@@ -67,22 +67,24 @@ public class UserServiceImpl implements IUserService {
     @Override
     @Transactional
     public Employer registerEmployer(EmployerRegisterRequestDTO dto) {
-        if (userRepository.existsByUsername(dto.getUsername())) {
-            throw new DuplicateResourceException("Username already taken");
+        if (userRepository.existsByUsername(dto.getEmail())) {
+            throw new DuplicateResourceException("Email already taken as username");
         }
         if (userRepository.existsByEmail(dto.getEmail())) {
             throw new DuplicateResourceException("Email already registered");
         }
-        log.info("Registering new employer: {}", dto.getUsername());
+        log.info("Registering new employer: {}", dto.getEmail());
         Employer employer = new Employer();
         employer.setName(dto.getName());
-        employer.setUsername(dto.getUsername());
+        employer.setUsername(dto.getEmail());
         employer.setPassword(passwordEncoder.encode(dto.getPassword()));
-        employer.setCompanyName(dto.getCompanyName());
+        employer.setCompanyName(dto.getCompanyName() != null && !dto.getCompanyName().isBlank()
+                ? dto.getCompanyName().trim()
+                : dto.getName() + " Inc.");
         employer.setProfilePictureUrl(null);
         employer.setRole(Role.EMPLOYER);
         employer.setEmail(dto.getEmail());
-        employer.setIndustry(dto.getIndustry());
+        employer.setIndustry("General");
         return employerRepository.save(employer);
     }
 

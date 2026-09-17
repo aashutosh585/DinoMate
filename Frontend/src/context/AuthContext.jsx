@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setUser(null);
-        window.location.href = "/login";
+        window.location.href = "/";
       }, msUntilExpiry);
     } catch {
       // malformed token — expiry check already handled at init

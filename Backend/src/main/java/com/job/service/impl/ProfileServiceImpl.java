@@ -46,6 +46,7 @@ public class ProfileServiceImpl implements IProfileService {
         log.info("Uploading resume for user: {}, file: {}", jobSeeker.getUsername(), file.getOriginalFilename());
         String url = cloudinaryService.uploadResume(file);
         jobSeeker.setResumeUrl(url);
+        jobSeeker.setResumeOriginalName(file.getOriginalFilename());
         userRepository.save(jobSeeker);
         return url;
     }

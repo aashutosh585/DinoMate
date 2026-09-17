@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -29,10 +30,10 @@ public class SavedJobServiceImpl implements ISavedJobService {
     public void saveJob(JobSeeker jobSeeker, Long jobId) {
         log.info("Job seeker {} saving job id: {}", jobSeeker.getUsername(), jobId);
 
-        JobSeeker freshJobSeeker = jobSeekerRepository.findById(jobSeeker.getId())
+        JobSeeker freshJobSeeker = jobSeekerRepository.findById(Objects.requireNonNull(jobSeeker.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
 
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findById(Objects.requireNonNull(jobId))
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
         if (freshJobSeeker.getSavedJobs().contains(job)) {
@@ -47,10 +48,10 @@ public class SavedJobServiceImpl implements ISavedJobService {
     public void unsaveJob(JobSeeker jobSeeker, Long jobId) {
         log.info("Job seeker {} unsaving job id: {}", jobSeeker.getUsername(), jobId);
 
-        JobSeeker freshJobSeeker = jobSeekerRepository.findById(jobSeeker.getId())
+        JobSeeker freshJobSeeker = jobSeekerRepository.findById(Objects.requireNonNull(jobSeeker.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
 
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findById(Objects.requireNonNull(jobId))
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
         if (!freshJobSeeker.getSavedJobs().contains(job)) {
@@ -63,7 +64,7 @@ public class SavedJobServiceImpl implements ISavedJobService {
     @Override
     @Transactional(readOnly = true)
     public List<JobResponseDTO> getSavedJobs(JobSeeker jobSeeker) {
-        JobSeeker freshJobSeeker = jobSeekerRepository.findById(jobSeeker.getId())
+        JobSeeker freshJobSeeker = jobSeekerRepository.findById(Objects.requireNonNull(jobSeeker.getId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
 
         return freshJobSeeker.getSavedJobs().stream()

@@ -56,6 +56,7 @@ public class CloudinaryService {
             options.put("use_filename", true);
             options.put("unique_filename", true);
 
+            @SuppressWarnings("unchecked")
             Map<String, Object> result = cloudinary.uploader().upload(
                 file.getBytes(), options
             );

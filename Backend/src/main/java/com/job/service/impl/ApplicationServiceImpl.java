@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -45,7 +46,7 @@ public class ApplicationServiceImpl implements IApplicationService {
             throw new BadRequestException("You must upload a resume before applying to a job.");
         }
 
-        Job job = jobRepository.findById(dto.getJobId())
+        Job job = jobRepository.findById(Objects.requireNonNull(dto.getJobId()))
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
         boolean alreadyApplied = applicationRepository.existsByJobAndJobSeeker(job, jobSeeker);
@@ -108,7 +109,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     @Override
     @Transactional(readOnly = true)
     public ApplicationResponseDTO getApplicationById(Long id, JobSeeker requester) {
-        Application app = applicationRepository.findById(id)
+        Application app = applicationRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
         if (!app.getJobSeeker().getId().equals(requester.getId())) {
@@ -122,7 +123,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     @Transactional
     public void withdrawApplication(Long id, JobSeeker requester) {
         log.info("Job seeker {} withdrawing application id: {}", requester.getUsername(), id);
-        Application app = applicationRepository.findById(id)
+        Application app = applicationRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
         if (!app.getJobSeeker().getId().equals(requester.getId())) {
@@ -135,7 +136,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     @Override
     @Transactional(readOnly = true)
     public List<ApplicationViewForEmployerDTO> getApplicationsForJob(Long jobId, Employer employer) {
-        Job job = jobRepository.findById(jobId)
+        Job job = jobRepository.findById(Objects.requireNonNull(jobId))
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
 
         if (!job.getEmployer().getId().equals(employer.getId())) {
@@ -152,7 +153,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     @Override
     @Transactional(readOnly = true)
     public ApplicationViewForEmployerDTO getApplicationViewForEmployer(Long id, Employer employer) {
-        Application app = applicationRepository.findById(id)
+        Application app = applicationRepository.findById(Objects.requireNonNull(id))
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
         if (!app.getJob().getEmployer().getId().equals(employer.getId())) {
@@ -166,7 +167,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     @Transactional
     public void updateApplicationStatus(Long applicationId, ApplicationStatus newStatus, Employer employer) {
         log.info("Employer {} updating application id: {} to status: {}", employer.getUsername(), applicationId, newStatus);
-        Application app = applicationRepository.findById(applicationId)
+        Application app = applicationRepository.findById(Objects.requireNonNull(applicationId))
                 .orElseThrow(() -> new ResourceNotFoundException("Application not found"));
 
         if (!app.getJob().getEmployer().getId().equals(employer.getId())) {
@@ -200,16 +201,20 @@ public class ApplicationServiceImpl implements IApplicationService {
         dto.setAppliedAt(application.getAppliedAt());
 
         Job job = application.getJob();
-        dto.setJobId(job.getId());
-        dto.setJobTitle(job.getTitle());
-        dto.setJobType(job.getType().toString());
-        dto.setWorkMode(job.getWorkMode().toString());
-        dto.setLocation(job.getLocation());
-        dto.setJobDescription(job.getDescription());
+        if (job != null) {
+            dto.setJobId(job.getId());
+            dto.setJobTitle(job.getTitle());
+            dto.setJobType(job.getType() != null ? job.getType().toString() : "N/A");
+            dto.setWorkMode(job.getWorkMode() != null ? job.getWorkMode().toString() : "N/A");
+            dto.setLocation(job.getLocation());
+            dto.setJobDescription(job.getDescription());
 
-        Employer employer = job.getEmployer();
-        dto.setCompanyName(employer.getCompanyName());
-        dto.setCompanyLogoUrl(employer.getProfilePictureUrl());
+            Employer employer = job.getEmployer();
+            if (employer != null) {
+                dto.setCompanyName(employer.getCompanyName());
+                dto.setCompanyLogoUrl(employer.getProfilePictureUrl());
+            }
+        }
 
         dto.setResumeUrl(application.getResumeUrl());
 

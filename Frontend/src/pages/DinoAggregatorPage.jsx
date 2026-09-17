@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import Navbar from '../components/navbar/Navbar';
 import Footer from '../components/Footer';
 import API_URL from '../api/config';
 import { toast } from 'react-toastify';
@@ -52,17 +51,37 @@ const CLUSTERS = {
   }
 };
 
+import clientCache from '../utils/cache';
+
 export default function DinoAggregatorPage() {
   const [selectedCluster, setSelectedCluster] = useState('startups');
   const [keyword, setKeyword] = useState('Software Engineer');
   const [location, setLocation] = useState('Remote');
   const [limit, setLimit] = useState(25);
-  const [saveToDb, setSaveToDb] = useState(false);
+  const saveToDb = true; // Always save scraped jobs to database
   const [sources, setSources] = useState(CLUSTERS.startups.sources);
+
+  const [activeTab, setActiveTab] = useState('live'); // 'live' or 'history'
+  const [savedJobs, setSavedJobs] = useState([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+
+  // Helper to decode HTML entities and strip tags
+  const cleanDescription = (html) => {
+    if (!html) return '';
+    try {
+      const txt = document.createElement('textarea');
+      txt.innerHTML = html;
+      const decoded = txt.value;
+      return decoded.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim();
+    } catch (e) {
+      return html;
+    }
+  };
 
   // Sync sources whenever cluster changes
   const handleClusterSelect = (clusterKey) => {
@@ -91,7 +110,7 @@ export default function DinoAggregatorPage() {
       location: location.trim() || 'Remote',
       sources: sources,
       limit: Number(limit) || 25,
-      dryRun: !saveToDb,
+      dryRun: false,
       triggerSource: 'admin'
     };
 
@@ -108,11 +127,11 @@ export default function DinoAggregatorPage() {
       setResults(data);
 
       if (data.success) {
-        if (saveToDb && data.dbStats) {
-          toast.success(`Success! Saved ${data.dbStats.insertedCount} jobs into PostgreSQL.`);
-        } else {
-          toast.success(`Retrieved ${data.normalizedCount || data.jobs?.length || 0} jobs successfully!`);
-        }
+        // Invalidate caches so Jobs feed and History tab refresh immediately
+        clientCache.invalidateNamespace("aggregator");
+        clientCache.invalidateNamespace("jobs");
+        const count = data.dbStats?.insertedCount ?? data.normalizedCount ?? data.jobs?.length ?? 0;
+        toast.success(`Success! Ingested and saved ${count} jobs directly to PostgreSQL.`);
       } else {
         toast.warning(data.message || 'Scrape service notice received.');
       }
@@ -123,6 +142,46 @@ export default function DinoAggregatorPage() {
     }
   };
 
+  const loadHistory = async () => {
+    const cacheKey = `aggregator:saved:history`;
+    const cached = clientCache.get(cacheKey);
+
+    if (cached) {
+      setSavedJobs(cached.data);
+      if (!cached.isStale) return;
+    } else {
+      setHistoryLoading(true);
+    }
+
+    try {
+      const data = await clientCache.fetchWithCache(
+        cacheKey,
+        async () => {
+          const res = await fetch(`${API_URL}/api/aggregator/jobs?page=0&size=50`);
+          const json = await res.json();
+          return json.content || [];
+        },
+        {
+          ttl: 2 * 60 * 1000,
+          swr: true,
+          persist: true,
+          onRevalidated: (freshJobs) => setSavedJobs(freshJobs),
+        }
+      );
+      setSavedJobs(data);
+    } catch (err) {
+      if (!cached) toast.error('Failed to load saved history.');
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'history') {
+      loadHistory();
+    }
+  }, [activeTab]);
+
   const generatedCurlCommand = `curl -X POST "http://localhost:8080/api/aggregator/scrape" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -130,7 +189,7 @@ export default function DinoAggregatorPage() {
     "location": "${location}",
     "sources": ${JSON.stringify(sources)},
     "limit": ${limit},
-    "dryRun": ${!saveToDb},
+    "dryRun": false,
     "triggerSource": "admin"
   }'`;
 
@@ -144,8 +203,6 @@ export default function DinoAggregatorPage() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
       <div>
-        <Navbar />
-
         {/* Hero Section */}
         <div className="bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 text-white py-12 px-6 shadow-md border-b border-emerald-800/40">
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
@@ -181,9 +238,35 @@ export default function DinoAggregatorPage() {
           </div>
         </div>
 
+        {/* Tab Navigation */}
+        <div className="max-w-6xl mx-auto px-6 pt-6">
+          <div className="flex border-b border-slate-200">
+            <button
+              onClick={() => setActiveTab('live')}
+              className={`px-6 py-3 font-semibold text-sm transition-colors relative ${
+                activeTab === 'live' ? 'text-emerald-700' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Live Scraper
+              {activeTab === 'live' && <span className="absolute bottom-[-1px] left-0 w-full h-0.5 bg-emerald-600 rounded-t"></span>}
+            </button>
+            <button
+              onClick={() => setActiveTab('history')}
+              className={`px-6 py-3 font-semibold text-sm transition-colors relative ${
+                activeTab === 'history' ? 'text-emerald-700' : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              Saved Database History
+              {activeTab === 'history' && <span className="absolute bottom-[-1px] left-0 w-full h-0.5 bg-emerald-600 rounded-t"></span>}
+            </button>
+          </div>
+        </div>
+
         {/* Main Content Container */}
         <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
 
+        {activeTab === 'live' && (
+          <>
           {/* 1. Recommended Platform Clusters */}
           <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
             <h2 className="text-sm uppercase tracking-wider font-bold text-slate-500 flex items-center gap-2">
@@ -284,27 +367,12 @@ export default function DinoAggregatorPage() {
               </div>
             </div>
 
-            {/* Persistence Switch & Action Buttons */}
+            {/* Auto-Save Status & Action Button */}
             <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <label className="flex items-center gap-3 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={saveToDb}
-                  onChange={(e) => setSaveToDb(e.target.checked)}
-                  className="w-5 h-5 accent-emerald-600 rounded cursor-pointer"
-                />
-                <div>
-                  <div className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <FaDatabase className={saveToDb ? "text-emerald-600" : "text-slate-400"} />
-                    Save Directly to Database (PostgreSQL)
-                  </div>
-                  <div className="text-xs text-slate-500">
-                    {saveToDb 
-                      ? 'Jobs will be stored in PostgreSQL and displayed in the main Job Catalog.'
-                      : 'Dry run preview only. Nothing written to database.'}
-                  </div>
-                </div>
-              </label>
+              <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3 py-2 rounded-xl border border-emerald-200">
+                <FaDatabase className="text-emerald-600 text-sm" />
+                <span>Auto-Save to PostgreSQL Database: Active</span>
+              </div>
 
               <button
                 onClick={executeScrape}
@@ -314,11 +382,11 @@ export default function DinoAggregatorPage() {
                 {loading ? (
                   <>
                     <FaSyncAlt className="animate-spin text-sm" />
-                    <span>Scraping 150+ Platforms...</span>
+                    <span>Scraping 150+ Platforms & Saving...</span>
                   </>
                 ) : (
                   <>
-                    <span>⚡ Run Aggregator & Sync</span>
+                    <span>⚡ Run Aggregator & Save Jobs</span>
                   </>
                 )}
               </button>
@@ -429,7 +497,7 @@ export default function DinoAggregatorPage() {
 
                         {job.description && (
                           <p className="text-xs text-slate-500 line-clamp-3 mt-1 leading-relaxed">
-                            {job.description}
+                            {cleanDescription(job.description)}
                           </p>
                         )}
 
@@ -461,15 +529,23 @@ export default function DinoAggregatorPage() {
                           <div className="text-slate-400">Competitive Compensation</div>
                         )}
 
-                        <a
-                          href={job.url || job.link || '#'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold rounded-lg transition"
-                        >
-                          <span>Apply Official</span>
-                          <FaExternalLinkAlt className="text-[10px]" />
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setSelectedJob(job)}
+                            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition"
+                          >
+                            View Detail
+                          </button>
+                          <a
+                            href={job.url || job.link || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold rounded-lg transition"
+                          >
+                            <span>Apply Official</span>
+                            <FaExternalLinkAlt className="text-[10px]" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -483,8 +559,179 @@ export default function DinoAggregatorPage() {
               )}
             </div>
           )}
+          </>
+        )}
+
+        {activeTab === 'history' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <h2 className="font-bold text-slate-800 flex items-center gap-2">
+                <FaDatabase className="text-emerald-600" /> PostgreSQL Saved Aggregated Jobs
+              </h2>
+              <button
+                onClick={loadHistory}
+                disabled={historyLoading}
+                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-2"
+              >
+                <FaSyncAlt className={historyLoading ? 'animate-spin' : ''} /> Refresh
+              </button>
+            </div>
+
+            {historyLoading ? (
+              <div className="text-center py-12 text-slate-500 text-sm">Loading history...</div>
+            ) : savedJobs.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {savedJobs.map((job) => (
+                  <div
+                    key={job.id}
+                    className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:shadow-md transition flex flex-col justify-between gap-4"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="text-xs font-bold uppercase tracking-wider text-emerald-700">
+                            {job.companyName}
+                          </div>
+                          <h3 className="font-bold text-slate-900 text-base mt-0.5 leading-snug">
+                            {job.title}
+                          </h3>
+                        </div>
+                        <span className="px-2 py-0.5 rounded text-[11px] font-bold uppercase bg-slate-100 text-slate-600 border border-slate-200 whitespace-nowrap">
+                          {job.sourcePlatform || 'Aggregator'}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600">
+                        <span className="bg-slate-100 px-2 py-0.5 rounded">
+                          📍 {job.location || 'Remote'}
+                        </span>
+                        {job.workMode && (
+                          <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">
+                            {job.workMode}
+                          </span>
+                        )}
+                        {job.experienceLevel && (
+                          <span className="bg-purple-50 text-purple-700 px-2 py-0.5 rounded font-medium">
+                            {job.experienceLevel}
+                          </span>
+                        )}
+                      </div>
+
+                      {job.description && (
+                        <p className="text-xs text-slate-500 line-clamp-3 mt-1 leading-relaxed">
+                          {cleanDescription(job.description)}
+                        </p>
+                      )}
+
+                      {job.requiredSkills && job.requiredSkills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-1">
+                          {job.requiredSkills.slice(0, 5).map((skill, sIdx) => (
+                            <span
+                              key={sIdx}
+                              className="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium"
+                            >
+                              {skill}
+                            </span>
+                          ))}
+                          {job.requiredSkills.length > 5 && (
+                            <span className="text-[11px] px-1.5 py-0.5 text-slate-400">
+                              +{job.requiredSkills.length - 5}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                      {job.salaryMin || job.salaryMax ? (
+                        <div className="font-semibold text-slate-700">
+                          💰 {job.currency || '$'}{job.salaryMin} - {job.salaryMax}
+                        </div>
+                      ) : (
+                        <div className="text-slate-400">Competitive Compensation</div>
+                      )}
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setSelectedJob({ ...job, company: job.companyName, url: job.url, link: job.url, source: job.sourcePlatform })}
+                          className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg transition"
+                        >
+                          View Detail
+                        </button>
+                        <a
+                          href={job.url || job.link || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-slate-900 hover:bg-black text-white font-semibold rounded-lg transition"
+                        >
+                          <span>Apply Official</span>
+                          <FaExternalLinkAlt className="text-[10px]" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-500 text-sm">
+                No saved jobs found in the database. Run the scraper and enable "Save to DB".
+              </div>
+            )}
+          </div>
+        )}
         </div>
       </div>
+
+      {/* Modal for Job Details */}
+      {selectedJob && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-2xl max-h-[85vh] overflow-y-auto shadow-2xl relative">
+            <button
+              onClick={() => setSelectedJob(null)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl font-bold"
+            >
+              &times;
+            </button>
+            <div className="mb-4">
+              <div className="text-sm font-bold uppercase tracking-wider text-emerald-700 mb-1">
+                {selectedJob.company || 'Tech Company'}
+              </div>
+              <h2 className="text-2xl font-black text-slate-900 leading-tight mb-2">
+                {selectedJob.title}
+              </h2>
+              <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 mb-4">
+                <span className="bg-slate-100 px-2 py-1 rounded">📍 {selectedJob.location || 'Remote'}</span>
+                {selectedJob.workMode && <span className="bg-blue-50 text-blue-700 px-2 py-1 rounded font-medium">{selectedJob.workMode}</span>}
+                {selectedJob.experienceLevel && <span className="bg-purple-50 text-purple-700 px-2 py-1 rounded font-medium">{selectedJob.experienceLevel}</span>}
+              </div>
+            </div>
+            
+            <div className="prose prose-sm prose-slate max-w-none">
+              <h3 className="text-lg font-bold text-slate-800 mb-2">Job Description</h3>
+              <div className="whitespace-pre-wrap text-slate-600 leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-100">
+                {cleanDescription(selectedJob.description) || 'No description provided.'}
+              </div>
+            </div>
+
+            <div className="mt-6 pt-4 border-t border-slate-100 flex justify-end gap-3">
+              <button
+                onClick={() => setSelectedJob(null)}
+                className="px-5 py-2 rounded-lg font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition"
+              >
+                Close
+              </button>
+              <a
+                href={selectedJob.url || selectedJob.link || '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-5 py-2 rounded-lg font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition flex items-center gap-2"
+              >
+                Apply on {selectedJob.source || 'Platform'} <FaExternalLinkAlt className="text-xs" />
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

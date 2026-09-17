@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 
-export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
+export default function NavbarGuest({ onOpenAuth }) {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -30,8 +30,8 @@ export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
               Live 150+ Sync
             </span>
             <span className="hover:text-black cursor-pointer">Companies</span>
-            <span className="hover:text-black cursor-pointer" onClick={onOpenEmployer}>For Employers</span>
-            <span className="hover:text-black cursor-pointer" onClick={onOpenJobSeeker}>For Professionals</span>
+            <span className="hover:text-black cursor-pointer" onClick={onOpenAuth}>For Employers</span>
+            <span className="hover:text-black cursor-pointer" onClick={onOpenAuth}>For Professionals</span>
           </div>
         </div>
 
@@ -40,30 +40,18 @@ export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
 
           {/* Desktop login / sign-up dropdowns */}
           <div className="hidden md:flex items-center gap-3">
-            <div className="relative group">
-              <button className="px-4 py-1.5 border rounded hover:bg-gray-100 text-sm">
-                Login
-              </button>
-              <div className="absolute hidden group-hover:flex flex-col bg-white border shadow-md right-0 top-[110%] z-20 min-w-[140px] rounded">
-                <button onClick={onOpenJobSeeker} className="px-4 py-2 hover:bg-gray-100 text-left text-sm">As Job Seeker</button>
-                <button onClick={onOpenEmployer} className="px-4 py-2 hover:bg-gray-100 text-left text-sm">As Employer</button>
-              </div>
-            </div>
-            <div className="relative group">
-              <button className="px-4 py-1.5 bg-black text-white rounded hover:opacity-90 text-sm">
-                Sign Up
-              </button>
-              <div className="absolute hidden group-hover:flex flex-col bg-white border shadow-md right-0 top-[110%] z-20 min-w-[140px] rounded">
-                <button onClick={onOpenJobSeeker} className="px-4 py-2 hover:bg-gray-100 text-left text-sm">As Job Seeker</button>
-                <button onClick={onOpenEmployer} className="px-4 py-2 hover:bg-gray-100 text-left text-sm">As Employer</button>
-              </div>
-            </div>
+            <button onClick={onOpenAuth} className="px-4 py-1.5 border rounded hover:bg-gray-100 text-sm">
+              Login
+            </button>
+            <button onClick={onOpenAuth} className="px-4 py-1.5 bg-black text-white rounded hover:opacity-90 text-sm">
+              Sign Up
+            </button>
           </div>
 
           {/* Mobile: plain buttons + hamburger */}
           <div className="flex md:hidden items-center gap-2">
-            <button onClick={onOpenJobSeeker} className="px-3 py-1.5 border rounded text-sm">Login</button>
-            <button onClick={onOpenJobSeeker} className="px-3 py-1.5 bg-black text-white rounded text-sm">Sign Up</button>
+            <button onClick={onOpenAuth} className="px-3 py-1.5 border rounded text-sm">Login</button>
+            <button onClick={onOpenAuth} className="px-3 py-1.5 bg-black text-white rounded text-sm">Sign Up</button>
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="text-xl p-1 ml-1"
@@ -83,8 +71,8 @@ export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
             <img src="/dinomate.png" alt="" className="w-5 h-5 object-contain inline-block" /> Live 150+ Sync
           </span>
           <span className="cursor-pointer hover:text-black" onClick={closeMenu}>Companies</span>
-          <span className="cursor-pointer hover:text-black" onClick={() => { onOpenEmployer(); closeMenu(); }}>For Employers</span>
-          <span className="cursor-pointer hover:text-black" onClick={() => { onOpenJobSeeker(); closeMenu(); }}>For Professionals</span>
+          <span className="cursor-pointer hover:text-black" onClick={() => { onOpenAuth(); closeMenu(); }}>For Employers</span>
+          <span className="cursor-pointer hover:text-black" onClick={() => { onOpenAuth(); closeMenu(); }}>For Professionals</span>
         </div>
       )}
     </nav>

@@ -25,7 +25,8 @@ export default function EmployerDashboard() {
   useEffect(() => {
     async function fetchApplications() {
       try {
-        const { data } = await apiClient.get("/applications/employer");
+        const data = await apiClient.getCached("/applications/employer", {}, { ttl: 60 * 1000, swr: true });
+        if (!Array.isArray(data)) return;
         setApplications(data);
 
         const pendingCount = data.filter(app => app.status === "PENDING").length;
@@ -50,7 +51,8 @@ export default function EmployerDashboard() {
   useEffect(() => {
     async function fetchJobs() {
       try {
-        const { data } = await apiClient.get("/jobs/my");
+        const data = await apiClient.getCached("/jobs/my", {}, { ttl: 2 * 60 * 1000, swr: true });
+        if (!Array.isArray(data)) return;
         const sorted = [...data].sort(
           (a, b) => new Date(b.postedAt) - new Date(a.postedAt)
         );

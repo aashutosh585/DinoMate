@@ -3,8 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
 import Home from './pages/Home';
 import Navbar from './components/navbar/Navbar';
-import JobSeekerModal from './modals/JobSeekerModal';
-import EmployerModal from './modals/EmployerModal';
+import AuthModal from './modals/AuthModal';
 import { ToastContainer } from 'react-toastify';
 import Jobs from './pages/Jobs';
 import ApplyPage from './pages/ApplyPage'; 
@@ -23,16 +22,15 @@ import UpdateJobPage from "./pages/UpdateJobPage";
 import EmployerApplicantsPage from "./pages/EmployerApplicantsPage";
 import ApplicationDetailsEmployerPage from "./pages/ApplicationDetailsEmployerPage";
 import DinoAggregatorPage from "./pages/DinoAggregatorPage";
+import JobApplicantsPage from "./pages/JobApplicantsPage";
 
 function App() {
-  const [showJobSeekerModal, setShowJobSeekerModal] = useState(false);
-  const [showEmployerModal, setShowEmployerModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   return (
     <Router>
       <Navbar
-        onOpenJobSeeker={() => setShowJobSeekerModal(true)}
-        onOpenEmployer={() => setShowEmployerModal(true)}
+        onOpenAuth={() => setShowAuthModal(true)}
       />
 
       <ToastContainer position="top-center" autoClose={2000} pauseOnHover />
@@ -112,13 +110,9 @@ function App() {
       </ErrorBoundary>
 
       {/* Modals */}
-      <JobSeekerModal
-        isOpen={showJobSeekerModal}
-        onClose={() => setShowJobSeekerModal(false)}
-      />
-      <EmployerModal
-        isOpen={showEmployerModal}
-        onClose={() => setShowEmployerModal(false)}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
       />
     </Router>
   );

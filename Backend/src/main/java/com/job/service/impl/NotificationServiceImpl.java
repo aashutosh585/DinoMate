@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -63,7 +64,7 @@ public class NotificationServiceImpl implements INotificationService {
     @Transactional
     public void markAsRead(Long notificationId, JobSeeker jobSeeker) {
         log.info("Marking notification id: {} as read for user: {}", notificationId, jobSeeker.getUsername());
-        Notification notification = notificationRepository.findById(notificationId)
+        Notification notification = notificationRepository.findById(Objects.requireNonNull(notificationId))
                 .orElseThrow(() -> new ResourceNotFoundException("Notification not found"));
 
         if (!notification.getRecipient().getId().equals(jobSeeker.getId())) {

@@ -28,5 +28,7 @@ public interface ApplicationRepository extends JpaRepository<Application, Long> 
 
     @Query("SELECT a FROM Application a JOIN FETCH a.jobSeeker JOIN FETCH a.job j JOIN FETCH j.employer WHERE j.employer = :employer")
     List<Application> findByJob_Employer(@Param("employer") Employer employer);
-    List<Application> findByJob_EmployerAndStatus(Employer employer, ApplicationStatus status);
+
+    @Query("SELECT a FROM Application a JOIN FETCH a.jobSeeker JOIN FETCH a.job j JOIN FETCH j.employer WHERE j.employer = :employer AND a.status = :status")
+    List<Application> findByJob_EmployerAndStatus(@Param("employer") Employer employer, @Param("status") ApplicationStatus status);
 }
