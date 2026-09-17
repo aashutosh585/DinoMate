@@ -109,17 +109,63 @@ please navigate to the [Backend README](./Backend/README.md).
 - **Responsive design** that adapts to all screen sizes including mobile.
 - **Live production deployment** — Frontend live at [dino-mate-jar4.vercel.app](https://dino-mate-jar4.vercel.app/) and Backend live at [dinomate.onrender.com](https://dinomate.onrender.com/).
 
----
-
-## 📄 Full Walkthrough
-To see **all 60+ screenshots** with detailed explanations for every step of both Job Seeker and Employer workflows:  
-➡️ [**View Full Screenshot Walkthrough**](./Full_Walkthrough.md)
 
 ---
 
-## 📂 Project Structure
-project-root/
-│ README.md
-│ Full_Walkthrough.md
-│ backend/
-│ frontend/
+## 📂 Repository Architecture & Project Structure
+
+```plaintext
+DinoMate/
+├── 📁 Backend/                         # Spring Boot 3.x REST API & Aggregation Engine
+│   ├── 📁 src/main/java/com/job/
+│   │   ├── 📁 config/                  # Security, CORS, Async, Mail & Cloudinary configurations
+│   │   ├── 📁 controller/              # REST Endpoints (Health, Auth, Jobs, Apps, Aggregator)
+│   │   ├── 📁 dto/                     # Request & Response Data Transfer Objects (DTOs)
+│   │   ├── 📁 entity/                  # JPA Entities (User, JobSeeker, Employer, Job, Application)
+│   │   ├── 📁 enums/                   # Role, JobType, WorkMode, ApplicationStatus
+│   │   ├── 📁 exception/               # GlobalExceptionHandler & custom exception classes
+│   │   ├── 📁 filter/                  # Bucket4j AuthRateLimitFilter (DDoS & Brute-force protection)
+│   │   ├── 📁 repository/              # Spring Data JPA interfaces with optimized JPQL queries
+│   │   ├── 📁 security/                # Stateless JWT AuthFilter & JwtUtil token provider
+│   │   └── 📁 service/                 # Business logic & 150+ platform ingestion pipeline
+│   ├── 📁 src/main/resources/          # application.properties & database schemas
+│   ├── 🐳 Dockerfile                   # Multi-stage production container build
+│   └── 📄 pom.xml                      # Maven dependencies & build configuration
+│
+├── 📁 Frontend/                        # React 18 + Vite SPA Client
+│   ├── 📁 src/
+│   │   ├── 📁 api/                     # Axios HTTP client, baseURL & interceptors
+│   │   ├── 📁 assets/                  # Logos, icons & brand media
+│   │   ├── 📁 components/              # Reusable UI (Navbar, JobCard, JobDetails, Badges)
+│   │   ├── 📁 context/                 # Global state (AuthContext, NotificationContext)
+│   │   ├── 📁 modals/                  # AuthModal, ApplyModal & Confirmation dialogs
+│   │   ├── 📁 pages/                   # Landing, Jobs, DinoAggregator, Dashboards, Profile
+│   │   └── 📁 utils/                   # Client-side multi-tier caching (SWR/TTL)
+│   ├── 📄 vercel.json                  # Single-Page Application rewrite rules for Vercel
+│   ├── 📄 vite.config.js               # Vite build & plugin settings
+│   └── 📄 package.json                 # NPM scripts & dependencies
+│
+├── 📁 ScreenShots/                     # Visual walkthrough assets & feature demos
+├── 📜 Full_Walkthrough.md              # Detailed 60+ UI screenshot documentation
+├── ⚙️ dino-job-sync.ps1                # Automated PowerShell job ingestion script
+├── ⚙️ dino-job-sync.bat                # Windows batch runner for scheduled sync
+└── 📘 README.md                        # Master repository documentation
+```
+
+### 🧱 Core Architecture Layers
+
+| Layer | Technologies | Responsibilities |
+| :--- | :--- | :--- |
+| **Client (Frontend)** | React 18, Vite, Tailwind CSS | Single-page UI, real-time client-side SWR caching, authentication state management, responsive job search & employer dashboards |
+| **API & Security** | Spring Security, JWT, Bucket4j | Stateless token authorization, rate-limiting, CORS origin validation, public health check probes (`/health`) |
+| **Business Logic** | Spring Boot Service Layer | Application workflow processing, resume upload orchestration via Cloudinary, email delivery |
+| **Ingestion Matrix** | Aggregator Service, RestTemplate | Scrapes & normalizes postings from 150+ ATS platforms (Greenhouse, Lever, Ashby, LinkedIn) with SHA-256 deduplication |
+| **Persistence** | PostgreSQL, Hibernate, HikariCP | Relational data persistence, indexed search queries, ACID transactions |
+| **Container & Cloud** | Docker, Render, Vercel | Multi-stage containerized backend with zero-downtime health probes on Render; global edge CDN frontend on Vercel |
+
+---
+
+## 📄 Full Walkthrough & Documentation
+To explore **all 60+ screenshots** with step-by-step explanations for both Job Seeker and Employer workflows:  
+➡️ [**View Full Screenshot Walkthrough Guide**](./Full_Walkthrough.md)
+
