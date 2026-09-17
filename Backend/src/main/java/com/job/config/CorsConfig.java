@@ -19,6 +19,7 @@ public class CorsConfig {
                 "http://localhost:*",
                 "http://127.0.0.1:*",
                 "https://*.vercel.app",
+                "https://dino-mate-jar4.vercel.app",
                 "https://*.onrender.com",
                 "https://*.netlify.app",
                 "https://full-stack-job-portal-three.vercel.app",
