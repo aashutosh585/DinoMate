@@ -20,8 +20,7 @@ public class CorsConfig {
                 "https://full-stack-job-portal-git-main-ahmeds-projects-cc4d86f7.vercel.app",
                 "https://jobportal.dev",
                 "https://www.jobportal.dev",
-                "http://localhost:5173"
-        ));
+                "http://localhost:5173"));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
