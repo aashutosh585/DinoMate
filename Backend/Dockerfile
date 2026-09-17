@@ -10,6 +10,7 @@ RUN mvn dependency:go-offline -B || true
 
 # Copy application source code and compile production JAR
 COPY src ./src
+RUN [ -f src/main/resources/application.properties ] || cp src/main/resources/application.properties.example src/main/resources/application.properties
 RUN mvn clean package -DskipTests -B
 
 # ---------------------------------------------------

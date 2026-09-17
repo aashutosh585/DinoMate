@@ -14,6 +14,9 @@ import com.job.repository.JobRepository;
 import com.job.service.interfaces.IJobService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +37,7 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
+    @CacheEvict(value = "jobs_list", allEntries = true)
     public Job createJob(JobRequestDTO dto, Employer employer) {
         log.info("Creating job '{}' for employer: {}", dto.getTitle(), employer.getUsername());
         Job job = new Job();
@@ -57,6 +61,7 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "jobs_list", key = "'all_' + #page + '_' + #size")
     public PageResponseDTO<JobResponseDTO> getAllJobsSortedByDate(int page, int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("postedAt").descending());
         return toPageResponse(jobRepository.findAllWithEmployer(pageable));
@@ -104,6 +109,7 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional(readOnly = true)
+    @Cacheable(value = "jobs", key = "#id")
     public JobResponseDTO getJobById(Long id) {
         Job job = jobRepository.findByIdWithEmployer(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Job not found"));
@@ -112,6 +118,10 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "jobs", key = "#id"),
+            @CacheEvict(value = "jobs_list", allEntries = true)
+    })
     public JobResponseDTO updateJob(Long id, JobRequestDTO dto, Employer employer) {
         log.info("Updating job id: {} by employer: {}", id, employer.getUsername());
         Job job = jobRepository.findByIdWithEmployer(id)
@@ -136,6 +146,10 @@ public class JobServiceImpl implements IJobService {
 
     @Override
     @Transactional
+    @Caching(evict = {
+            @CacheEvict(value = "jobs", key = "#jobId"),
+            @CacheEvict(value = "jobs_list", allEntries = true)
+    })
     public void deleteJob(Long jobId, Employer employer) {
         log.info("Deleting job id: {} by employer: {}", jobId, employer.getUsername());
         Job job = jobRepository.findByIdWithEmployer(jobId)

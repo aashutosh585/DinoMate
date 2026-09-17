@@ -1,0 +1,55 @@
+# ===================================================
+# 🦕 Dino_Mate — Application Configuration Example
+# ===================================================
+
+server.port=${SERVER_PORT:8080}
+
+# Database Configuration (PostgreSQL by default)
+spring.datasource.url=${DB_URL:jdbc:postgresql://localhost:5432/jobportal}
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:postgres}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=false
+spring.jpa.properties.hibernate.format_sql=false
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+# JWT Configuration
+jwt.secret=${JWT_SECRET:dino_mate_secure_jwt_token_secret_key_32_chars_2026!}
+jwt.expiration=${JWT_EXPIRATION:86400000}
+
+# Cloudinary Configuration
+cloudinary.cloud-name=${CLOUDINARY_CLOUD_NAME:demo}
+cloudinary.api-key=${CLOUDINARY_API_KEY:demo}
+cloudinary.api-secret=${CLOUDINARY_API_SECRET:demo}
+
+# Mail Configuration
+spring.mail.host=${MAIL_HOST:smtp.gmail.com}
+spring.mail.port=${MAIL_PORT:587}
+spring.mail.username=${MAIL_USERNAME:your-email@gmail.com}
+spring.mail.password=${MAIL_PASSWORD:your-app-password}
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true
+app.email.from=${APP_EMAIL_FROM:notifications@dinomate.dev}
+app.email.name=${APP_EMAIL_NAME:Dino_Mate}
+
+# DinoMate Aggregator Engine (150+ Platforms)
+aggregator.api.url=${AGGREGATOR_API_URL:http://localhost:3001/api/scrape}
+aggregator.api.secret=${AGGREGATOR_API_SECRET:nope}
+aggregator.api.email=${AGGREGATOR_API_EMAIL:ashutoshmaurya585@gmail.com}
+
+# Rate Limiting
+auth.ratelimit.requests=${AUTH_RATELIMIT_REQUESTS:10}
+auth.ratelimit.window-minutes=${AUTH_RATELIMIT_WINDOW_MINUTES:1}
+
+# File Upload Limits
+spring.servlet.multipart.max-file-size=10MB
+spring.servlet.multipart.max-request-size=10MB
+
+# Redis Cache Configuration
+spring.data.redis.url=${REDIS_URL:redis://default:a0mbYCpTJ00lOi7TUCElNAPOKTTtdGbi@redis-16061.c246.us-east-1-4.ec2.cloud.redislabs.com:16061}
+spring.cache.type=redis
+spring.cache.redis.time-to-live=600000
+spring.cache.redis.cache-null-values=false
+spring.cache.redis.key-prefix=dinomate:
+spring.cache.redis.use-key-prefix=true
