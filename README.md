@@ -1,9 +1,27 @@
 # 🦕 Dino_Mate — Full-Stack Job Marketplace & Real-Time 150+ Platform Aggregator
 
+[![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://dino-mate-jar4.vercel.app/)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://dinomate.onrender.com/)
+[![Health Check](https://img.shields.io/badge/Health%20Route-200%20OK-brightgreen?style=for-the-badge)](https://dinomate.onrender.com/health)
+[![Java](https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+
 A complete **full-stack job portal and aggregation platform** built with **Java Spring Boot (Backend)**, **React + Vite (Frontend)**, and **PostgreSQL**.  
 It supports **secure authentication**, role-based access for job seekers and employers, and a **real-time job aggregator engine** capable of ingesting live job postings from **150+ platforms** (Greenhouse, Lever, Ashby, LinkedIn, Google, Internshala, etc.) directly into the database.
 
 ---
+
+## 🚀 Live Demo & Production Deployments
+
+| Component | Service Platform | Live URL | Status |
+| :--- | :--- | :--- | :--- |
+| **🌐 Frontend Web App** | **Vercel** | [https://dino-mate-jar4.vercel.app/](https://dino-mate-jar4.vercel.app/) | ✅ Online |
+| **⚡ Backend REST API** | **Render (Docker)** | [https://dinomate.onrender.com/](https://dinomate.onrender.com/) | ✅ Online |
+| **🩺 Health Check Route** | **Render** | [https://dinomate.onrender.com/health](https://dinomate.onrender.com/health) | 🟢 `200 OK` |
+
+---
+
 📁 **Project:** Dino_Mate | Real-Time Job Aggregator & Portal  
 ---
 
@@ -44,11 +62,12 @@ please navigate to the [Backend README](./Backend/README.md).
 - Context API
 - Tailwind CSS
 
-### ☁️ Deployment
-- DigitalOcean — Backend (Spring Boot + PostgreSQL)
-- Vercel — Frontend (React)
-- Cloudinary — File & image storage
-- Custom domain — [jobportal.dev](https://www.jobportal.dev/)
+### ☁️ Production Deployment
+- **Vercel** — Frontend Production App: [https://dino-mate-jar4.vercel.app/](https://dino-mate-jar4.vercel.app/)
+- **Render** — Backend Dockerized Web Service: [https://dinomate.onrender.com/](https://dinomate.onrender.com/)
+- **Health Check API** — Public Health & Status Route: [https://dinomate.onrender.com/health](https://dinomate.onrender.com/health)
+- **Cloudinary** — Secure Cloud Storage for Resumes & Profile Pictures
+- **PostgreSQL / H2** — Database with HikariCP connection pooling
 
 ---
 
@@ -86,131 +105,9 @@ please navigate to the [Backend README](./Backend/README.md).
 - **Role-based access control** with @PreAuthorize annotations protecting every endpoint (JOB_SEEKER / EMPLOYER).
 - **Global exception handling** ensuring consistent, proper error responses across the app.
 - **Dockerized backend** for consistent and portable deployment.
-- **CORS security** restricted to specific allowed origins only.
+- **CORS security** configured with secure pattern matching across local and production origins.
 - **Responsive design** that adapts to all screen sizes including mobile.
-- **Deployed with a custom domain** — fully accessible at [jobportal.dev](https://www.jobportal.dev/).
-
----
-
-## 🖼️ Screenshots (General Overview)
-
-### 🌐 Common Pages
-
-#### 1. Home Page
-![HomePage](./ScreenShots/HomePage.png)  
-The landing page for both job seekers and employers, with clear options to sign up or log in.
-
-#### 2. Selection Options
-![SelectionOptions](./ScreenShots/SelectionOptions.png)  
-Role selection menu ensuring users choose the correct account type before signing up or logging in.
-
----
-
-### 👤 Job Seeker Flow (15 Screenshots)
-
-#### 1. Registering as a Job Seeker
-![RegisteringJobSeeker](./ScreenShots/RegisteringJobSeeker.png)  
-Signup form with required details (name, username, password, DOB, email) and optional profile picture & resume.
-
-#### 2. Landing Job Page
-![LandingJobPage](./ScreenShots/LandingJobPage.png)  
-Main job listing interface with job cards on the left and job details on the right.
-
-#### 3. Viewing More Jobs (Pagination)
-![ViewingJobs](./ScreenShots/ViewingJobs.png)  
-Pagination controls allow browsing through more job postings.
-
-#### 4. Selected Job (Google Example)
-![SelectedJobGoogle](./ScreenShots/SelectedJobGoogle.png)  
-Detailed job view with responsibilities, skills, and application options.
-
-#### 5. Search by Type
-![SearchTypes](./ScreenShots/SearchTypes.png)  
-Filter jobs by type (Full-time, Part-time, Internship, etc.).
-
-#### 6. Searching for a Job
-![SearchingForJob](./ScreenShots/SearchingForJob.png)  
-Example of searching for internships — results show only relevant positions.
-
-#### 7. Job Card Design
-![JobCard](./ScreenShots/JobCard.png)  
-Compact card layout displaying job title, company logo, location, and type.
-
-#### 8. Saving a Job
-![SavingGameDevJob](./ScreenShots/SavingGameDevJob.png)  
-Saving a job triggers a toast notification and fills the save icon.
-
-#### 9. My Jobs Page
-![MyJobs](./ScreenShots/MyJobs.png)  
-Tabs for Saved, Applied, and Interviews, with job counts in each category.
-
-#### 10. Removing a Saved Job
-![RemovingSavedJob](./ScreenShots/RemovingSavedJob.png)  
-Removing a saved job instantly updates the list and count.
-
-#### 11. Applying for a Saved Job
-![ApplyingforGameDevJob](./ScreenShots/ApplyingforGameDevJob.png)  
-Start of application process, beginning with screening questions.
-
-#### 12. Application Details
-![ApplicationDetails](./ScreenShots/ApplicationDeatils.png)  
-Submitted application overview showing job info, resume link, and status.
-
-#### 13. Notification Pop-Up
-![NotificationPopUp](./ScreenShots/NotificationPopUp.png)  
-Pop-up showing status changes for multiple job applications.
-
-#### 14. Notification Closer Look
-![NotificationCloserLook](./ScreenShots/NotificationCloserLook.png)  
-Detailed pop-up view with company logos, job titles, and status updates.
-
-#### 15. Notification from Bell
-![NotificationFromBell](./ScreenShots/NotificationFromBell.png)  
-Dropdown list of notifications accessible from the navbar bell icon.
-
----
-
-### 🧑‍💼 Employer Flow (10 Screenshots)
-
-#### 1. Employer Sign Up
-![EmployerSignUp](./ScreenShots/EmployerSiginUp.png)  
-Signup form for employers with account info, company name, industry, email, and logo.
-
-#### 2. Employer Dashboard (Empty)
-![DashboardGoogle](./ScreenShots/DashboardGoogle.png)  
-Empty dashboard shown after signing in before any jobs are posted.
-
-#### 3. Creating a Job (Step 1)
-![CreatingJob](./ScreenShots/CreatingJob.png)  
-Starting job creation by adding the title and description.
-
-#### 4. Adding Required Skills
-![CreatingJob4](./ScreenShots/CreatingJob4.png)  
-Step for entering skills required for the position.
-
-#### 5. Job Created Successfully
-![CreatingJobSuccessfully](./ScreenShots/CreatingJobSucessfully.png)  
-Confirmation screen with options to view the job or add another.
-
-#### 6. Created Job Details
-![CreatedJobDetails](./ScreenShots/CreatedJobDetails.png)  
-Job details page with edit and delete controls.
-
-#### 7. Dashboard After Adding Jobs
-![DashboardGoogleAfterAddingJobs](./ScreenShots/DashboardGoogleAfteraddingJobs.png)  
-Dashboard with counts for jobs and applicants after posting multiple jobs.
-
-#### 8. Viewing Applicants
-![ViewingApplicants](./ScreenShots/ViewingApplicants.png)  
-List of applicants for a specific job.
-
-#### 9. Viewing Application Details
-![ViewingApplicationDetails](./ScreenShots/ViewingApplicationDetails.png)  
-Detailed applicant view with resume link and application info.
-
-#### 10. Status Changed to Accepted
-![StatusChangedToAccepted](./ScreenShots/Statuschangedtoaccepted.png)  
-Applicant status updated to "Accepted" with automatic notification.
+- **Live production deployment** — Frontend live at [dino-mate-jar4.vercel.app](https://dino-mate-jar4.vercel.app/) and Backend live at [dinomate.onrender.com](https://dinomate.onrender.com/).
 
 ---
 
@@ -226,4 +123,3 @@ project-root/
 │ Full_Walkthrough.md
 │ backend/
 │ frontend/
-└── ScreenShots/

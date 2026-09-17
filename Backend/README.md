@@ -1,6 +1,18 @@
 # 💼 Job Portal — Backend (Spring Boot)
 
-A production-ready backend for a Job Portal platform where **Employers** post jobs and manage applications, and **Job Seekers** search, save, and apply to jobs. Built with **Spring Boot**, **Spring Security (JWT)**, **Hibernate/JPA**, and **MySQL**.
+[![Backend API](https://img.shields.io/badge/Render-Live%20API-46E3B7?style=for-the-badge&logo=render)](https://dinomate.onrender.com/)
+[![Health Check](https://img.shields.io/badge/Health%20Status-200%20OK-brightgreen?style=for-the-badge)](https://dinomate.onrender.com/health)
+[![Frontend Client](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://dino-mate-jar4.vercel.app/)
+
+A production-ready backend for a Job Portal platform where **Employers** post jobs and manage applications, and **Job Seekers** search, save, and apply to jobs. Built with **Spring Boot**, **Spring Security (JWT)**, **Hibernate/JPA**, and **PostgreSQL / MySQL**.
+
+---
+
+## 🌐 Production URLs
+
+- **Primary API Base URL**: [https://dinomate.onrender.com/](https://dinomate.onrender.com/)
+- **Health Check Route**: [https://dinomate.onrender.com/health](https://dinomate.onrender.com/health)
+- **Frontend Application**: [https://dino-mate-jar4.vercel.app/](https://dino-mate-jar4.vercel.app/)
 
 ---
 
