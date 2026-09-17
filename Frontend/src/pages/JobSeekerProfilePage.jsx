@@ -141,9 +141,10 @@ export default function JobSeekerProfilePage() {
           <div className="relative w-36 h-36 md:w-40 md:h-40 rounded-full overflow-hidden border border-gray-300 shadow-sm">
             {(previewUrl || formData.profilePicture) ? (
               <img
-                src={previewUrl || formData.profilePicture || "/default-avatar.png"}
+                src={previewUrl || formData.profilePicture || "/dinomate.png"}
                 alt="Profile"
                 className="w-full h-full object-cover"
+                onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
               />
             ) : (
               <div className="w-full h-full bg-gray-100 flex items-center justify-center text-gray-500 text-sm">

@@ -21,7 +21,7 @@ export default function CreateJobPage() {
   const navigate = useNavigate();
   let user = null;
   try { user = JSON.parse(localStorage.getItem("user")); } catch {}
-  const logoUrl = user?.profilePicture || "/default-logo.png";
+  const logoUrl = user?.profilePicture || "/dinomate.png";
   const companyName = user?.companyName || user?.name || "Your Company";
 
   const handleChange = (e) => {
@@ -47,7 +47,8 @@ export default function CreateJobPage() {
         <img
           src={logoUrl}
           alt="Company Logo"
-          className="w-14 h-14 object-contain rounded border"
+          className="w-14 h-14 object-contain rounded border p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#6B3F27]">{companyName}</h1>

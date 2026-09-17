@@ -55,9 +55,10 @@ export default function CustomNotificationToast({ notification, toastId }) {
 
       {/* Company logo */}
       <img
-        src={notification.companyLogoUrl || "/default-logo.png"}
+        src={notification.companyLogoUrl || "/dinomate.png"}
         alt="Company Logo"
-        className="w-10 h-10 rounded-full object-contain border"
+        className="w-10 h-10 rounded-full object-contain border p-0.5 bg-white"
+        onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
       />
 
       {/* Message + Button */}

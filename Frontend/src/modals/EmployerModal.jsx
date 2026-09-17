@@ -131,8 +131,8 @@ export default function EmployerModal({ isOpen, onClose }) {
             &times;
           </button>
 
-          <div className="text-center text-2xl font-extrabold text-emerald-700 mb-4 flex items-center justify-center gap-1.5">
-            <span>🦕</span> Dino_Mate
+          <div className="text-center text-2xl font-extrabold text-emerald-700 mb-4 flex items-center justify-center gap-2">
+            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
           </div>
 
           <div className="flex mb-4 border-b border-gray-200">

@@ -15,10 +15,10 @@ export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
         {/* LEFT - Logo + desktop nav links */}
         <div className="flex items-center gap-6 text-sm font-medium text-gray-800">
           <span
-            className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-1.5 tracking-tight"
+            className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-2 tracking-tight"
             onClick={() => navigate("/")}
           >
-            <span>🦕</span> Dino_Mate
+            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
           </span>
           <div className="hidden md:flex items-center gap-6">
             <span className="hover:text-black cursor-pointer" onClick={() => navigate('/jobs')}>Jobs</span>
@@ -79,7 +79,9 @@ export default function NavbarGuest({ onOpenJobSeeker, onOpenEmployer }) {
       {menuOpen && (
         <div className="md:hidden mt-3 border-t pt-3 flex flex-col gap-4 text-sm font-medium text-gray-800">
           <span className="cursor-pointer hover:text-black" onClick={() => { navigate('/jobs'); closeMenu(); }}>Jobs</span>
-          <span className="cursor-pointer text-emerald-700 font-semibold flex items-center gap-1.5" onClick={() => { navigate('/aggregator'); closeMenu(); }}>🦕 Live 150+ Sync</span>
+          <span className="cursor-pointer text-emerald-700 font-semibold flex items-center gap-1.5" onClick={() => { navigate('/aggregator'); closeMenu(); }}>
+            <img src="/dinomate.png" alt="" className="w-5 h-5 object-contain inline-block" /> Live 150+ Sync
+          </span>
           <span className="cursor-pointer hover:text-black" onClick={closeMenu}>Companies</span>
           <span className="cursor-pointer hover:text-black" onClick={() => { onOpenEmployer(); closeMenu(); }}>For Employers</span>
           <span className="cursor-pointer hover:text-black" onClick={() => { onOpenJobSeeker(); closeMenu(); }}>For Professionals</span>

@@ -12,7 +12,7 @@ export default function EmployerApplicantsPage() {
 
   let user = null;
   try { user = JSON.parse(localStorage.getItem("user")); } catch {}
-  const logoUrl = user?.profilePicture || "/default-logo.png";
+  const logoUrl = user?.profilePicture || "/dinomate.png";
   const companyName = user?.companyName || user?.name || "Your Company";
 
   useEffect(() => {
@@ -49,7 +49,8 @@ export default function EmployerApplicantsPage() {
         <img
           src={logoUrl}
           alt="Company Logo"
-          className="w-12 h-12 object-contain rounded border"
+          className="w-12 h-12 object-contain rounded border p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
         <div>
           <h1 className="text-2xl font-bold">{companyName}</h1>
@@ -70,9 +71,10 @@ export default function EmployerApplicantsPage() {
             <div className="flex justify-between items-center gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <img
-                  src={a.applicantProfilePicture || "/default-avatar.png"}
+                  src={a.applicantProfilePicture || "/dinomate.png"}
                   alt="Applicant"
-                  className="w-10 h-10 flex-shrink-0 rounded-full object-cover border"
+                  className="w-10 h-10 flex-shrink-0 rounded-full object-cover border bg-white"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
                 />
                 <h2 className="text-base font-semibold text-gray-800 truncate">{a.applicantUsername}</h2>
                 {isNew(a.appliedAt) && (

@@ -42,9 +42,10 @@ export default function AppliedJobCard({ application, onWithdraw, onRefresh }) {
       <div className="flex items-center gap-4 min-w-0 flex-1">
         <div className="w-12 h-12 flex-shrink-0 bg-gray-100 border rounded-full overflow-hidden flex items-center justify-center">
           <img
-            src={application.companyLogoUrl || "/default-logo.png"}
+            src={application.companyLogoUrl || "/dinomate.png"}
             alt="Company Logo"
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain p-1 bg-white"
+            onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
           />
         </div>
         <div className="min-w-0">

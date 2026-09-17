@@ -29,10 +29,10 @@ export default function NavbarEmployer() {
 
         {/* LEFT - Logo */}
         <span
-          className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-1.5 tracking-tight"
+          className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-2 tracking-tight"
           onClick={() => navigate("/dashboard")}
         >
-          <span>🦕</span> Dino_Mate
+          <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
         </span>
 
         {/* CENTER - Desktop navigation */}

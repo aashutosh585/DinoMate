@@ -151,7 +151,7 @@ export default function DinoAggregatorPage() {
           <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-semibold mb-3">
-                <span>🦕</span> Dino_Mate Live Engine &bull; 150+ Platforms
+                <img src="/dinomate.png" alt="" className="w-4 h-4 object-contain inline-block" /> Dino_Mate Live Engine &bull; 150+ Platforms
               </div>
               <h1 className="text-3xl md:text-5xl font-black tracking-tight text-white">
                 Real-Time Job Aggregator

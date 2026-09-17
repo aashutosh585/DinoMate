@@ -11,8 +11,8 @@ export default function Footer() {
       {/* Top Columns */}
       <div className="max-w-7xl mx-auto py-10 px-6 grid grid-cols-2 md:grid-cols-5 gap-8">
         <div>
-          <h3 className="text-lg font-extrabold text-emerald-700 mb-2 flex items-center gap-1.5">
-            <span>🦕</span> Dino_Mate
+          <h3 className="text-lg font-extrabold text-emerald-700 mb-2 flex items-center gap-2">
+            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-7 h-7 object-contain rounded-md" /> Dino_Mate
           </h3>
           <p className="text-xs text-gray-500">Real-Time Job Aggregation from 150+ Platforms</p>
         </div>

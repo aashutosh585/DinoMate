@@ -79,9 +79,10 @@ export default function ApplicationDetailsEmployerPage() {
         {/* Left: Profile Picture */}
         <div className="flex-shrink-0">
           <img
-            src={application.applicantProfilePicture || "/default-avatar.png"}
+            src={application.applicantProfilePicture || "/dinomate.png"}
             alt="Profile"
-            className="w-32 h-32 object-cover rounded-full border"
+            className="w-32 h-32 object-cover rounded-full border bg-white"
+            onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
           />
         </div>
 

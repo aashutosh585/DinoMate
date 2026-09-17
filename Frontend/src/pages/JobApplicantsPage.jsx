@@ -19,7 +19,7 @@ export default function JobApplicantsPage() {
   try { user = JSON.parse(localStorage.getItem("user")); } catch {}
   const token = localStorage.getItem("token");
 
-  const logoUrl = user?.profilePicture || "/default-logo.png";
+  const logoUrl = user?.profilePicture || "/dinomate.png";
   const companyName = user?.companyName || user?.name || "Your Company";
 
   useEffect(() => {
@@ -59,7 +59,8 @@ export default function JobApplicantsPage() {
         <img
           src={logoUrl}
           alt="Company Logo"
-          className="w-12 h-12 object-contain rounded border"
+          className="w-12 h-12 object-contain rounded border p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
         <div>
           <h1 className="text-2xl font-bold">{companyName}</h1>
@@ -86,9 +87,10 @@ export default function JobApplicantsPage() {
               {/* Left: profile and info */}
               <div className="flex items-start gap-4 min-w-0 flex-1">
                 <img
-                  src={app.applicantProfilePicture || "/default-avatar.png"}
+                  src={app.applicantProfilePicture || "/dinomate.png"}
                   alt="Applicant"
-                  className="w-12 h-12 flex-shrink-0 rounded-full object-cover border"
+                  className="w-12 h-12 flex-shrink-0 rounded-full object-cover border bg-white"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
                 />
                 <div className="leading-snug min-w-0">
                   <p

@@ -53,9 +53,10 @@ export default function NotificationBell() {
                   className="flex gap-3 p-3 bg-white rounded-lg shadow-sm hover:shadow-md transition"
                 >
                   <img
-                    src={n.companyLogoUrl}
+                    src={n.companyLogoUrl || "/dinomate.png"}
                     alt="Company Logo"
-                    className="w-10 h-10 rounded-full object-contain border"
+                    className="w-10 h-10 rounded-full object-contain border p-0.5 bg-white"
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
                   />
                   <div className="flex-1">
                     <p className="text-sm text-gray-800 leading-snug">{n.message}</p>

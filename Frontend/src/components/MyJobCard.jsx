@@ -76,9 +76,10 @@ export default function MyJobCard({ job, tab, onUnsave, onWithdraw, onRefresh })
         >
           <div className="w-12 h-12 flex-shrink-0 rounded-full bg-gray-100 border flex items-center justify-center overflow-hidden">
             <img
-              src={job.profilePicture || "/default-logo.png"}
+              src={job.profilePicture || "/dinomate.png"}
               alt="Company Logo"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain p-1 bg-white"
+              onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
             />
           </div>
 

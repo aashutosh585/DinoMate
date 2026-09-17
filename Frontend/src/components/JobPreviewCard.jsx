@@ -5,7 +5,12 @@ export default function JobPreviewCard({ job, companyName, logoUrl }) {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="flex items-center gap-4 mb-4">
-        <img src={logoUrl} alt="Logo" className="w-12 h-12 rounded border" />
+        <img
+          src={logoUrl || "/dinomate.png"}
+          alt="Logo"
+          className="w-12 h-12 rounded border object-contain p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
+        />
         <h2 className="text-2xl font-bold">{job.title}</h2>
       </div>
 

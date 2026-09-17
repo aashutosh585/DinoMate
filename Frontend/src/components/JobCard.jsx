@@ -13,9 +13,10 @@ export default function JobCard({ job, isSelected, onSelect }) {
       {/* Logo */}
       <div className="w-16 h-16 flex-shrink-0 rounded-full overflow-hidden border border-gray-200 bg-gray-50 shadow-sm flex items-center justify-center">
         <img
-          src={job.profilePicture || '/default-logo.png'}
+          src={job.profilePicture || '/dinomate.png'}
           alt={job.companyName}
           className="w-12 h-12 object-contain"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
       </div>
 
@@ -45,7 +46,7 @@ export default function JobCard({ job, isSelected, onSelect }) {
             </span>
           ) : (
             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-              <span>🦕</span> Direct Portal
+              <img src="/dinomate.png" alt="" className="w-3.5 h-3.5 object-contain inline-block" /> Direct Portal
             </span>
           )}
         </div>

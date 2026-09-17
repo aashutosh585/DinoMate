@@ -11,7 +11,7 @@ export default function EmployerJobsPage() {
 
   let user = null;
   try { user = JSON.parse(localStorage.getItem("user")); } catch {}
-  const logoUrl = user?.profilePicture || "/default-logo.png";
+  const logoUrl = user?.profilePicture || "/dinomate.png";
   const companyName = user?.companyName || user?.name || "Your Company";
 
   useEffect(() => {
@@ -57,7 +57,8 @@ export default function EmployerJobsPage() {
         <img
           src={logoUrl}
           alt="Company Logo"
-          className="w-14 h-14 object-cover border rounded-md"
+          className="w-14 h-14 object-contain border rounded-md p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-800">{companyName}</h1>

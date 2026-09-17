@@ -73,9 +73,10 @@ export default function EmployerDashboard() {
       {/* Header */}
       <div className="flex flex-wrap items-center gap-4 mb-8">
         <img
-          src={user?.profilePicture || "/default-logo.png"}
+          src={user?.profilePicture || "/dinomate.png"}
           alt="Company Logo"
-          className="w-12 h-12 flex-shrink-0 object-contain border rounded-md"
+          className="w-12 h-12 flex-shrink-0 object-contain border rounded-md p-1 bg-white"
+          onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
         />
         <h1 className="text-2xl md:text-3xl font-bold min-w-0">
           Welcome, {user?.name || "Employer"}!
@@ -142,9 +143,10 @@ export default function EmployerDashboard() {
               {/* Left Side */}
               <div className="flex items-center gap-3 min-w-0 flex-1">
                 <img
-                  src={a.applicantProfilePicture || "/default-avatar.png"}
+                  src={a.applicantProfilePicture || "/dinomate.png"}
                   alt="Applicant"
-                  className="w-11 h-11 flex-shrink-0 rounded-full object-cover border"
+                  className="w-11 h-11 flex-shrink-0 rounded-full object-cover border bg-white"
+                  onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
                 />
                 <div className="leading-snug min-w-0">
                   <p className="font-semibold text-blue-700 hover:underline flex items-center gap-2 flex-wrap">

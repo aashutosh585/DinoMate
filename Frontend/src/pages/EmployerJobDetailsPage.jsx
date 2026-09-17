@@ -94,13 +94,12 @@ export default function EmployerJobDetailsPage() {
 
         {/* Header */}
         <div className="flex flex-wrap items-center gap-4 mb-4">
-          {job.profilePicture && (
-            <img
-              src={job.profilePicture || "/default-logo.png"}
-              alt="Company Logo"
-              className="w-12 h-12 object-contain rounded border"
-            />
-          )}
+          <img
+            src={job.profilePicture || "/dinomate.png"}
+            alt="Company Logo"
+            className="w-12 h-12 object-contain rounded border p-1 bg-white"
+            onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
+          />
           <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
         </div>
 

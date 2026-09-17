@@ -126,9 +126,10 @@ export default function JobDetails({ job }) {
       <div className="flex items-center gap-4 mb-4">
         <div className="w-16 h-16 rounded border overflow-hidden bg-gray-100">
           <img
-            src={job.profilePicture || "/default-logo.png"}
+            src={job.profilePicture || "/dinomate.png"}
             alt={job.companyName || "Company Logo"}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain p-1 bg-white"
+            onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
           />
         </div>
         <div>
@@ -156,8 +157,8 @@ export default function JobDetails({ job }) {
             🌐 Aggregated &bull; {job.sourcePlatform || "External"}
           </span>
         ) : (
-          <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
-            🦕 Dino_Mate Direct
+          <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
+            <img src="/dinomate.png" alt="" className="w-3.5 h-3.5 object-contain inline-block" /> Dino_Mate Direct
           </span>
         )}
         <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">

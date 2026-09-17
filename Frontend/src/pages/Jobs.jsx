@@ -161,13 +161,13 @@ export default function Jobs() {
           </button>
           <button
             onClick={() => setSourceFilter("PORTAL")}
-            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-md transition flex items-center gap-1.5 ${
               sourceFilter === "PORTAL"
                 ? "bg-emerald-700 text-white shadow-sm"
                 : "text-slate-600 hover:text-emerald-700"
             }`}
           >
-            <span>🦕</span> Direct Portal
+            <img src="/dinomate.png" alt="" className="w-4 h-4 object-contain inline-block" /> Direct Portal
           </button>
           <button
             onClick={() => setSourceFilter("AGGREGATED")}

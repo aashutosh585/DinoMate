@@ -35,9 +35,10 @@ export default function ApplicationDetailsCard({ application }) {
       <div className="flex flex-wrap items-center gap-4 md:gap-5 mb-5 md:mb-6">
         <div className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded border bg-white flex items-center justify-center overflow-hidden">
           <img
-            src={application.companyLogoUrl || "/default-logo.png"}
+            src={application.companyLogoUrl || "/dinomate.png"}
             alt="Company Logo"
-            className="object-contain w-full h-full"
+            className="object-contain w-full h-full p-1"
+            onError={(e) => { e.target.onerror = null; e.target.src = '/dinomate.png'; }}
           />
         </div>
         <div className="min-w-0 flex-1">
