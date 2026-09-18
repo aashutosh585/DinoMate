@@ -123,7 +123,7 @@ export default function JobDetails({ job }) {
                 : "bg-emerald-700 hover:bg-emerald-800 text-white"
             }`}
           >
-            {hasApplied ? "Applied – View Application" : "Apply on Dino_Mate"}
+            {hasApplied ? "Applied – View Application" : "Apply on DinoMate"}
           </button>
         )}
       </div>
@@ -164,7 +164,7 @@ export default function JobDetails({ job }) {
           </span>
         ) : (
           <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5">
-            <img src="/dinomate.png" alt="" className="w-3.5 h-3.5 object-contain inline-block" /> Dino_Mate Direct
+            <img src="/dinomate.png" alt="" className="w-3.5 h-3.5 object-contain inline-block" /> DinoMate Direct
           </span>
         )}
         <span className="bg-slate-100 text-slate-800 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">

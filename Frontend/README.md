@@ -1,11 +1,11 @@
-# 🦕 Dino_Mate — Frontend (React + Vite)
+# 🦕 DinoMate — Frontend (React + Vite)
 
 [![Live Demo](https://img.shields.io/badge/Vercel-Live%20App-black?style=for-the-badge&logo=vercel)](https://dino-mate-jar4.vercel.app/)
 [![Backend API](https://img.shields.io/badge/Render-API%20Backend-46E3B7?style=for-the-badge&logo=render)](https://dinomate.onrender.com/)
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-The modern, responsive frontend application for the **Dino_Mate** job marketplace and 150+ platform aggregator, built with **React 18**, **Vite**, and **Tailwind CSS**.
+The modern, responsive frontend application for the **DinoMate** job marketplace and 150+ platform aggregator, built with **React 18**, **Vite**, and **Tailwind CSS**.
 
 ---
 

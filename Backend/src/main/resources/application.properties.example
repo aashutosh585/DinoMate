@@ -1,5 +1,5 @@
 # ===================================================
-# 🦕 Dino_Mate — Application Configuration Example
+# 🦕 DinoMate — Application Configuration Example
 # ===================================================
 
 server.port=${SERVER_PORT:8080}
@@ -31,7 +31,7 @@ spring.mail.password=${MAIL_PASSWORD:your-app-password}
 spring.mail.properties.mail.smtp.auth=true
 spring.mail.properties.mail.smtp.starttls.enable=true
 app.email.from=${APP_EMAIL_FROM:notifications@dinomate.dev}
-app.email.name=${APP_EMAIL_NAME:Dino_Mate}
+app.email.name=${APP_EMAIL_NAME:DinoMate}
 
 # DinoMate Aggregator Engine (150+ Platforms)
 aggregator.api.url=${AGGREGATOR_API_URL:http://localhost:3001/api/scrape}

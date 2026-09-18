@@ -1,4 +1,4 @@
-# 🦕 Dino_Mate — Full-Stack Job Marketplace & Real-Time 150+ Platform Aggregator
+# 🦕 DinoMate — Full-Stack Job Marketplace & Real-Time 150+ Platform Aggregator
 
 [![Frontend](https://img.shields.io/badge/Frontend-Vercel-black?style=for-the-badge&logo=vercel)](https://dino-mate-jar4.vercel.app/)
 [![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render)](https://dinomate.onrender.com/)
@@ -22,12 +22,12 @@ It supports **secure authentication**, role-based access for job seekers and emp
 
 ---
 
-📁 **Project:** Dino_Mate | Real-Time Job Aggregator & Portal  
+📁 **Project:** DinoMate | Real-Time Job Aggregator & Portal  
 ---
 
 ## 📖 About the Project
 
-**Dino_Mate** combines the interactive experience of platforms like LinkedIn or Indeed with an automated job ingestion engine:
+**DinoMate** combines the interactive experience of platforms like LinkedIn or Indeed with an automated job ingestion engine:
 - **Real-Time 150+ Platform Aggregator:** Scrape verified engineering and tech jobs directly from ATS feeds (Greenhouse, Lever, Ashby) and major platforms via UI or CLI command, with automatic deduplication and direct PostgreSQL storage.
 - **REST API Backend:** Built in Spring Boot with JWT authentication, rate-limiting (Bucket4j), and async event-driven email notifications (Observer Pattern).
 - **Interactive React UI:** Built with Vite and Tailwind CSS featuring a dedicated Dino Aggregator dashboard and full employer/seeker workflows.  

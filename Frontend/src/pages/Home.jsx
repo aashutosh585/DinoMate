@@ -28,10 +28,10 @@ export default function Home() {
         {/* Center Text */}
         <div className="text-center w-full md:w-1/2 lg:w-1/3 md:mt-10 mx-auto py-4 md:py-0">
           <div className="inline-flex items-center gap-2 px-3 py-1 mb-3 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold">
-            <img src="/dinomate.png" alt="" className="w-4 h-4 object-contain inline-block" /> Dino_Mate Powered — Aggregating 150+ Platforms
+            <img src="/dinomate.png" alt="" className="w-4 h-4 object-contain inline-block" /> DinoMate Powered — Aggregating 150+ Platforms
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-3 tracking-tight">
-            Find Your Dream Role with <span className="text-emerald-700">Dino_Mate</span>
+            Find Your Dream Role with <span className="text-emerald-700">DinoMate</span>
           </h1>
           <p className="text-sm sm:text-base md:text-lg text-gray-600 mb-6">
             Real-time job sync across Greenhouse, Lever, Ashby, LinkedIn, FAANG & top tech giants.

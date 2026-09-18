@@ -51,7 +51,7 @@ public class JobServiceImpl implements IJobService {
         job.setRequiredSkills(dto.getRequiredSkills());
         job.setScreeningQuestions(dto.getScreeningQuestions()); // Optional field
         job.setJobSource(com.job.enums.JobSource.PORTAL);
-        job.setSourcePlatform("Dino_Mate");
+        job.setSourcePlatform("DinoMate");
         job.setExternalApplyUrl(null);
         job.setPostedAt(LocalDateTime.now());
         job.setEmployer(employer);
@@ -195,7 +195,7 @@ public class JobServiceImpl implements IJobService {
         dto.setType(job.getType());
         dto.setWorkMode(job.getWorkMode());
         dto.setJobSource(job.getJobSource() != null ? job.getJobSource() : com.job.enums.JobSource.PORTAL);
-        dto.setSourcePlatform(job.getSourcePlatform() != null ? job.getSourcePlatform() : "Dino_Mate");
+        dto.setSourcePlatform(job.getSourcePlatform() != null ? job.getSourcePlatform() : "DinoMate");
         dto.setExternalApplyUrl(job.getExternalApplyUrl());
         dto.setProfilePicture(job.getEmployer().getProfilePictureUrl());
         dto.setEmployerId(job.getEmployer().getId());

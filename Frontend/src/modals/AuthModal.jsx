@@ -136,7 +136,7 @@ export default function AuthModal({ isOpen, onClose }) {
         <div className="p-6">
           <button className="absolute top-3 right-4 text-2xl leading-none" onClick={onClose}>&times;</button>
           <div className="text-center text-2xl font-extrabold text-emerald-700 mb-4 flex items-center justify-center gap-2">
-            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
+            <img src="/dinomate.png" alt="DinoMate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> DinoMate
           </div>
 
           <div className="flex mb-4 border-b border-gray-200">

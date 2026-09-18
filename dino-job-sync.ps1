@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    Dino_Mate Job Aggregator CLI Runner - Syncs real jobs from 150+ platforms directly into PostgreSQL DB.
+    DinoMate Job Aggregator CLI Runner - Syncs real jobs from 150+ platforms directly into PostgreSQL DB.
 .EXAMPLE
     .\dino-job-sync.ps1 -Keyword "SDE Intern" -Location "Remote" -Limit 30 -SaveToDb
     .\dino-job-sync.ps1 -Keyword "AI Engineer" -Location "Remote" -Cluster "faang" -SaveToDb
@@ -17,7 +17,7 @@ param(
 )
 
 Write-Host "==========================================================" -ForegroundColor Green
-Write-Host "🦕 Dino_Mate — 150+ Platform Job Aggregator & DB Sync CLI" -ForegroundColor Green
+Write-Host "🦕 DinoMate — 150+ Platform Job Aggregator & DB Sync CLI" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
 
 # Determine source cluster
@@ -44,7 +44,7 @@ Write-Host "• Sources:     $($sourceList -join ', ')" -ForegroundColor Cyan
 Write-Host "• Limit:       $Limit" -ForegroundColor Cyan
 Write-Host "• Save to DB:  $($SaveToDb.IsPresent) (dryRun: $dryRun)" -ForegroundColor ($SaveToDb ? "Yellow" : "Gray")
 Write-Host "----------------------------------------------------------"
-Write-Host "⚡ Calling Dino_Mate Aggregator..." -ForegroundColor Yellow
+Write-Host "⚡ Calling DinoMate Aggregator..." -ForegroundColor Yellow
 
 $payload = @{
     keyword       = $Keyword
@@ -97,5 +97,5 @@ try {
     }
 } catch {
     Write-Host " Connection Failed: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host " Ensure Dino_Mate Spring Boot backend is running on port 8080 and DinoMate Scraper is active." -ForegroundColor Yellow
+    Write-Host " Ensure DinoMate Spring Boot backend is running on port 8080 and DinoMate Scraper is active." -ForegroundColor Yellow
 }

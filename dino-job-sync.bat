@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 REM ==========================================================
-REM 🦕 Dino_Mate — 150+ Platform Job Aggregator & DB Sync CLI
+REM 🦕 DinoMate — 150+ Platform Job Aggregator & DB Sync CLI
 REM ==========================================================
 
 set KEYWORD=%~1
@@ -21,14 +21,14 @@ set DRYRUN=true
 if /I "%SAVETODB%"=="true" set DRYRUN=false
 
 echo ==========================================================
-echo  Dino_Mate Job Aggregator CLI Runner
+echo  DinoMate Job Aggregator CLI Runner
 echo ==========================================================
 echo  Keyword:    %KEYWORD%
 echo  Location:   %LOCATION%
 echo  Limit:      %LIMIT%
 echo  Save to DB: %SAVETODB% (dryRun: %DRYRUN%)
 echo ----------------------------------------------------------
-echo  Sending request to Dino_Mate Backend (http://localhost:8080/api/aggregator/scrape)...
+echo  Sending request to DinoMate Backend (http://localhost:8080/api/aggregator/scrape)...
 
 curl -s -X POST "http://localhost:8080/api/aggregator/scrape" ^
   -H "Content-Type: application/json" ^

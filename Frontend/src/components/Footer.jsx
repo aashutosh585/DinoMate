@@ -12,13 +12,13 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto py-10 px-6 grid grid-cols-2 md:grid-cols-5 gap-8">
         <div>
           <h3 className="text-lg font-extrabold text-emerald-700 mb-2 flex items-center gap-2">
-            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-7 h-7 object-contain rounded-md" /> Dino_Mate
+            <img src="/dinomate.png" alt="DinoMate Logo" className="w-7 h-7 object-contain rounded-md" /> DinoMate
           </h3>
           <p className="text-xs text-gray-500">Real-Time Job Aggregation from 150+ Platforms</p>
         </div>
 
         <div>
-          <h4 className="font-bold mb-2">Dino_Mate</h4>
+          <h4 className="font-bold mb-2">DinoMate</h4>
           <ul className="space-y-1">
             <li>About / Press</li>
             <li>Blog</li>
@@ -80,7 +80,7 @@ export default function Footer() {
           Browse by: <span className="font-semibold text-black">Companies, Jobs, Locations, Communities, Recent Posts</span>
         </p>
         <p className="mt-2">
-          © 2026 Dino_Mate. All rights reserved.
+          © 2026 DinoMate. All rights reserved.
         </p>
       </div>
     </footer>

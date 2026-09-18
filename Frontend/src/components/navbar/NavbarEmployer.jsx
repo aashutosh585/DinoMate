@@ -32,7 +32,7 @@ export default function NavbarEmployer() {
           className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-2 tracking-tight"
           onClick={() => navigate("/dashboard")}
         >
-          <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
+          <img src="/dinomate.png" alt="DinoMate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> DinoMate
         </span>
 
         {/* CENTER - Desktop navigation */}

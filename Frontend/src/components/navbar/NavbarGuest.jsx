@@ -18,7 +18,7 @@ export default function NavbarGuest({ onOpenAuth }) {
             className="text-xl font-extrabold text-emerald-700 cursor-pointer flex items-center gap-2 tracking-tight"
             onClick={() => navigate("/")}
           >
-            <img src="/dinomate.png" alt="Dino_Mate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> Dino_Mate
+            <img src="/dinomate.png" alt="DinoMate Logo" className="w-8 h-8 object-contain rounded-lg shadow-sm" /> DinoMate
           </span>
           <div className="hidden md:flex items-center gap-6">
             <span className="hover:text-black cursor-pointer" onClick={() => navigate('/jobs')}>Jobs</span>
